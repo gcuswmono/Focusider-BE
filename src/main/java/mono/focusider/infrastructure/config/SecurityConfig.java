@@ -13,7 +13,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import io.lettuce.core.dynamic.annotation.Value;
 import mono.focusider.infrastructure.Security.JwtAuthenticationFilter;
 import mono.focusider.infrastructure.Security.JwtAuthenticationProvider;
 import mono.focusider.infrastructure.Security.JwtSecretKey;
@@ -35,7 +34,8 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // Assuming your frontend runs on port 3000
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // Assuming your frontend runs on port
+                                                                                 // 3000
         configuration.addAllowedHeader("*");
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE"));
         configuration.setAllowCredentials(true);

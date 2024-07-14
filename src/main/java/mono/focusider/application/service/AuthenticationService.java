@@ -1,5 +1,6 @@
 package mono.focusider.application.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -85,5 +86,9 @@ public class AuthenticationService {
             log.warn("Invalid refresh token attempt for user: {}", username);
             throw new InvalidRefreshTokenException("Invalid refresh token");
         }
+    }
+
+    public boolean isUsernameAvailable(String username) {
+        return !userRepository.existsByUsername(username);
     }
 }

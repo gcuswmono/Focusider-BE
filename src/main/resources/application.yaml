@@ -35,3 +35,6 @@ logging:
         web: DEBUG
         security: DEBUG
     org.springframework.web.servlet.mvc.method.annotation: TRACE
+
+frontend:
+  url: http://localhost:3000

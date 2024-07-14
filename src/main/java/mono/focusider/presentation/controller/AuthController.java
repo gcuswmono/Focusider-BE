@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import mono.focusider.application.dto.AuthResponse;
 import mono.focusider.application.dto.LoginRequest;
 import mono.focusider.application.dto.SignupRequest;
+import mono.focusider.application.dto.UsernameAvailabilityResponse;
 import mono.focusider.application.service.AuthenticationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,5 +83,11 @@ public class AuthController {
                 response.addCookie(accessTokenCookie);
 
                 return ResponseEntity.ok().build();
+        }
+
+        @GetMapping("/check-username")
+        public ResponseEntity<?> checkUsernameAvailability(@RequestParam String username) {
+                boolean isAvailable = authenticationService.isUsernameAvailable(username);
+                return ResponseEntity.ok().body(new UsernameAvailabilityResponse(isAvailable));
         }
 }

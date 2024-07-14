@@ -2,7 +2,8 @@ spring:
   application:
     name: focusider
   datasource:
-    url: jdbc:mariadb://localhost:3307/sourcedb
+    # url: jdbc:mariadb://localhost:3307/sourcedb
+    url: jdbc:mariadb://mariadb.arcadiaprofit.shop:3307/sourcedb
     username: producer
     password: producer!!3732
   jpa:
@@ -10,8 +11,10 @@ spring:
       ddl-auto: update
   data:
     redis:
-      host: localhost
+      # host: localhost
+      host: redis.arcadiaprofit.shop
       port: 6379
+
 jwt:
   access:
     expiration: 300000 # 5 minutes
@@ -27,6 +30,8 @@ springdoc:
 logging:
   level:
     root: INFO
-    org.springframework.web: DEBUG
-    org.springframework.security: DEBUG
+    org:
+      springframework:
+        web: DEBUG
+        security: DEBUG
     org.springframework.web.servlet.mvc.method.annotation: TRACE

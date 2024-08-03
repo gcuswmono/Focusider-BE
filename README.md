@@ -2,7 +2,7 @@
 
 ### Overview
 
-This is a robust authentication service built with Spring Boot 3.3.1. It provides secure user registration, login, and token refresh functionalities using JWT (JSON Web Tokens).
+This is a robust authentication service built with Spring Boot 3.3.1. It provides secure member registration, login, and token refresh functionalities using JWT (JSON Web Tokens).
 
 ### Features
 
@@ -68,8 +68,8 @@ The main configuration file is `src/main/resources/application.yaml`. You may ne
 
 ### API Endpoints
 
-- POST `/api/auth/signup`: Register a new user
-- POST `/api/auth/login`: Authenticate a user and receive JWT tokens
+- POST `/api/auth/signup`: Register a new member
+- POST `/api/auth/login`: Authenticate a member and receive JWT tokens
 - POST `/api/auth/refresh`: Refresh the access token using a valid refresh token
 
 For detailed API documentation, run the application and visit `http://localhost:8080/swagger-ui.html`

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.auth.dto.info.AuthUserInfo;
 import mono.focusider.domain.auth.mapper.AuthMapper;
+import mono.focusider.domain.member.type.MemberRole;
 import mono.focusider.global.error.code.GlobalErrorCode;
 import mono.focusider.global.error.exception.ForbiddenException;
 import mono.focusider.global.error.exception.UnauthorizedException;
@@ -69,7 +70,9 @@ public class JwtFilter extends OncePerRequestFilter {
         String name = jwtUtil.getMemberName(token);
         String gender = jwtUtil.getMemberGender(token);
         Integer level = jwtUtil.getMemberLevel(token);
-        return authMapper.toAuthUserInfoWithToken(memberId, name, gender, level);
+        System.out.println(jwtUtil.getMemberRole(token));
+        MemberRole memberRole = MemberRole.valueOf(jwtUtil.getMemberRole(token));
+        return authMapper.toAuthUserInfoWithToken(memberId, name, gender, level, memberRole);
     }
 
 //    private String refreshAccessToken(String refreshToken, AuthUserInfo authUserInfo, HttpServletResponse response) {

@@ -1,72 +1,52 @@
 package mono.focusider.global.config;
 
+import lombok.RequiredArgsConstructor;
+import mono.focusider.domain.auth.mapper.AuthMapper;
+import mono.focusider.global.security.JwtFilter;
+import mono.focusider.global.security.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import mono.focusider.global.Security.JwtAuthenticationFilter;
-import mono.focusider.global.Security.JwtAuthenticationProvider;
-import mono.focusider.global.Security.JwtSecretKey;
-
-import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
-
-    private final JwtSecretKey jwtSecretKey;
-    private JwtAuthenticationProvider jwtAuthenticationProvider;
-
-    public SecurityConfig(JwtSecretKey jwtSecretKey, JwtAuthenticationProvider jwtAuthenticationProvider) {
-        this.jwtSecretKey = jwtSecretKey;
-        this.jwtAuthenticationProvider = jwtAuthenticationProvider;
-    }
+    private final JwtUtil jwtUtil;
+    private final AuthMapper authMapper;
+    //private final RedisUtils redisUtils;
 
     @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // Assuming your frontend runs on port
-                                                                                 // 3000
-        configuration.addAllowedHeader("*");
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE"));
-        configuration.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/swagger-ui.html").permitAll()
-                        .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/api-docs/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**").permitAll()
+                .csrf((auth) -> auth.disable())
+                .formLogin((auth) -> auth.disable())
+                .httpBasic((auth) -> auth.disable())
+                .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers("/api/auth/signup", "/api/auth/login", "/api/workation", "/v3/**", "/**")
+                        .permitAll()
                         .anyRequest()
-                        .authenticated())
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(jwtAuthenticationProvider)
-                .addFilterBefore(new JwtAuthenticationFilter(jwtSecretKey), UsernamePasswordAuthenticationFilter.class);
-
+                        .authenticated()
+                )
+                .addFilterBefore(new JwtFilter(jwtUtil, authMapper), UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }

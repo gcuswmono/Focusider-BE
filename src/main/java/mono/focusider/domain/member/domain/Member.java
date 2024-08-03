@@ -8,6 +8,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import mono.focusider.domain.attendance.domain.Attendance;
 import mono.focusider.domain.auth.dto.req.SignupRequestDto;
+import mono.focusider.domain.member.type.MemberRole;
+import mono.focusider.domain.member.type.converter.MemberRoleConverter;
 import mono.focusider.global.domain.BaseTimeEntity;
 
 @NoArgsConstructor
@@ -33,6 +35,10 @@ public class Member extends BaseTimeEntity {
     @Column(name = "level", nullable = false)
     private Integer level;
 
+    @Column(name = "member_role", nullable = false)
+    @Convert(converter = MemberRoleConverter.class)
+    private MemberRole memberRole;
+
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL)
     @Builder.Default
     private List<Attendance> attendances = new ArrayList<>();
@@ -46,6 +52,7 @@ public class Member extends BaseTimeEntity {
                 .gender(signupRequestDto.gender())
                 .birthDate(signupRequestDto.birthday())
                 .level(0)
+                .memberRole(MemberRole.ROLE_MEMBER)
                 .build();
     }
 }

@@ -35,7 +35,7 @@ spring:
 
   jwt:
     secret: 035181ea40e854b3a37b714bcf6c99f0df16e3040c3f65be4a0123032e00ee75fef03f85461cf71db7f535ae1cffbc248186b2e6f1e55b63dc5255183015bda6
-    expireAccessToken: 1800000
+    expireAccessToken: 1800
     expireRefreshToken: 604800000
 
 cloud:

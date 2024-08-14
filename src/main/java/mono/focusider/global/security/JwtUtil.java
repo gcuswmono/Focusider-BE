@@ -5,8 +5,11 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import mono.focusider.domain.auth.dto.info.AuthUserInfo;
 import mono.focusider.global.utils.cookie.CookieUtils;
+import mono.focusider.global.utils.redis.RedisExpiredData;
+import mono.focusider.global.utils.redis.RedisUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Getter
+@RequiredArgsConstructor
 @Component
 public class JwtUtil {
     private SecretKey secretKey;
@@ -26,6 +30,7 @@ public class JwtUtil {
     private long accessTokenExpireTime;
     @Value("${spring.jwt.expireRefreshToken}")
     private long refreshTokenExpireTime;
+    private final RedisUtils redisUtils;
 
     @PostConstruct
     public void init() {
@@ -92,7 +97,7 @@ public class JwtUtil {
         CookieUtils.addCookieWithMaxAge(response, accessTokenCookie, Math.toIntExact(accessTokenExpireTime));
     }
 
-//    public void addRedisTokenInfo(String refreshToken, String accessToken) {
-//        redisUtils.setDataWithExpireTime(accessToken, refreshToken, refreshTokenExpireTime);
-//    }
+    public void addRedisTokenInfo(String refreshToken, String accessToken) {
+        redisUtils.setDataWithExpireTime(RedisExpiredData.ofToken(accessToken, refreshToken, refreshTokenExpireTime));
+    }
 }

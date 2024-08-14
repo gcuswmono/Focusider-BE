@@ -3,7 +3,7 @@ package mono.focusider.domain.quiz.type;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import mono.focusider.global.enm.EnumField;
+import mono.focusider.global.utils.enm.EnumField;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter

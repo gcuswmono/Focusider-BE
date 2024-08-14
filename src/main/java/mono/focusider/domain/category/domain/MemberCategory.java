@@ -17,9 +17,18 @@ public class MemberCategory extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
+    @Setter
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    public static MemberCategory of(Member member, Category category) {
+        return MemberCategory
+                .builder()
+                .member(member)
+                .category(category)
+                .build();
+    }
 }

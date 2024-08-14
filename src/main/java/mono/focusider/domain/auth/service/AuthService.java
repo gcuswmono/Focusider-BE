@@ -1,9 +1,15 @@
 package mono.focusider.domain.auth.service;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import mono.focusider.domain.auth.dto.info.AuthUserInfo;
+import mono.focusider.domain.auth.dto.req.LoginRequestDto;
 import mono.focusider.domain.auth.dto.req.SignupRequestDto;
 import mono.focusider.domain.auth.helper.AuthHelper;
+import mono.focusider.domain.auth.mapper.AuthMapper;
 import mono.focusider.domain.auth.validator.AuthValidator;
+import mono.focusider.domain.member.domain.Member;
+import mono.focusider.domain.member.helper.MemberHelper;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,38 +23,26 @@ import mono.focusider.global.security.JwtUtil;
 public class AuthService {
     private final AuthValidator authValidator;
     private final PasswordEncoder passwordEncoder;
+    private final MemberHelper memberHelper;
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, String> redisTemplate;
     private final AuthHelper authHelper;
+    private final AuthMapper authMapper;
 
     public void signup(SignupRequestDto signupRequestDto) {
         authValidator.checkAccountId(signupRequestDto.accountId());
         String password = passwordEncoder.encode(signupRequestDto.password());
         authHelper.createMemberAndSave(signupRequestDto, password);
-
     }
-//
-//    public AuthResponseDto authenticate(String username, String password) {
-//        Member member = memberRepository.findByUsername(username)
-//                .orElseThrow(() -> {
-//                    log.warn("Authentication attempt for non-existent user: {}", username);
-//                    return new UsernameNotFoundException("User not found");
-//                });
-//
-//        if (passwordEncoder.matches(password, member.getPassword())) {
-//            String accessToken = jwtTokenUtil.generateAccessToken(username);
-//            String refreshToken = jwtTokenUtil.generateRefreshToken(username);
-//
-//            redisTemplate.opsForValue().set(username, refreshToken);
-//
-//            log.info("User authenticated successfully: {}", username);
-//            return new AuthResponseDto(accessToken, refreshToken);
-//        } else {
-//            log.warn("Failed authentication attempt for user: {}", username);
-//            throw new BadCredentialsException("Invalid credentials");
-//        }
-//    }
-//
+
+    public void login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
+        Member member = memberHelper.findMemberByAccountIdOrThrow(loginRequestDto.accountId());
+        authValidator.validatePassword(loginRequestDto.password(), member.getPassword(), passwordEncoder);
+        AuthUserInfo authUserInfo = AuthUserInfo.of(member);
+        String accessToken = jwtUtil.createAccessToken(authUserInfo);
+        jwtUtil.addAccessTokenToCookie(response, accessToken);
+    }
+
 //    public AuthResponseDto refreshToken(String refreshToken) {
 //        String username = jwtTokenUtil.getUsernameFromToken(refreshToken);
 //        String storedRefreshToken = redisTemplate.opsForValue().get(username);

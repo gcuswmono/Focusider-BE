@@ -3,14 +3,11 @@ package mono.focusider.application.auth.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import mono.focusider.domain.auth.dto.res.AuthResponseDto;
-import mono.focusider.domain.auth.dto.LoginRequestDto;
+import mono.focusider.domain.auth.dto.req.LoginRequestDto;
 import mono.focusider.domain.auth.dto.req.SignupRequestDto;
-import mono.focusider.domain.auth.dto.UsernameAvailabilityResponseDto;
 import mono.focusider.domain.auth.service.AuthService;
 
 import mono.focusider.global.domain.SuccessResponse;
@@ -37,30 +34,15 @@ public class AuthController {
                 return SuccessResponse.ok(null);
         }
 
-//        @Operation(summary = "Login a user", description = "Authenticate a user and return access and refresh tokens as cookies", responses = {
-//                        @ApiResponse(responseCode = "200", description = "Login successful"),
-//                        @ApiResponse(responseCode = "401", description = "Unauthorized - Invalid credentials")
-//        })
-//        @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
-//        public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequest, HttpServletResponse response) {
-//                AuthResponseDto authResponseDto = authService.authenticate(loginRequest.getUsername(),
-//                                loginRequest.getPassword());
-//
-//                Cookie accessTokenCookie = new Cookie("access_token", authResponseDto.getAccessToken());
-//                accessTokenCookie.setHttpOnly(false);
-//                accessTokenCookie.setSecure(true);
-//                accessTokenCookie.setPath("/");
-//
-//                Cookie refreshTokenCookie = new Cookie("refresh_token", authResponseDto.getRefreshToken());
-//                refreshTokenCookie.setHttpOnly(true);
-//                refreshTokenCookie.setSecure(true);
-//                refreshTokenCookie.setPath("/api/auth/refresh");
-//
-//                response.addCookie(accessTokenCookie);
-//                response.addCookie(refreshTokenCookie);
-//
-//                return ResponseEntity.ok().build();
-//        }
+        @Operation(summary = "Login a user", description = "Authenticate a user and return access and refresh tokens as cookies", responses = {
+                        @ApiResponse(responseCode = "200", description = "Login successful"),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized - Invalid credentials")
+        })
+        @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
+        public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequest, HttpServletResponse response) {
+                authService.login(loginRequest, response);
+                return SuccessResponse.ok(null);
+        }
 
 //        @Operation(summary = "Refresh access token", description = "Use a refresh token to obtain a new access token", responses = {
 //                        @ApiResponse(responseCode = "200", description = "New access token issued"),

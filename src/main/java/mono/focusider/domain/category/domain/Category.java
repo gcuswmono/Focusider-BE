@@ -18,7 +18,7 @@ public class Category extends BaseTimeEntity {
     @Column(name = "category_id")
     private Long id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "category_type", nullable = false)
     @Convert(converter = CategoryTypeConverter.class)
     private CategoryType categoryType;
 }

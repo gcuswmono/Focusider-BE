@@ -46,6 +46,7 @@ public class JwtUtil {
                 .claim("name", authUserInfo.name())
                 .claim("gender", authUserInfo.gender())
                 .claim("level", authUserInfo.level())
+                .claim("memberRole", authUserInfo.memberRole())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expireTime))
                 .signWith(secretKey)
@@ -71,6 +72,11 @@ public class JwtUtil {
     public Integer getMemberLevel(String token) {
         return Jwts.parser().verifyWith(secretKey).build()
                 .parseSignedClaims(token).getPayload().get("level", Integer.class);
+    }
+
+    public String getMemberRole(String token) {
+        return Jwts.parser().verifyWith(secretKey).build()
+                .parseSignedClaims(token).getPayload().get("memberRole", String.class);
     }
 
     public Boolean isExpired(String token) {

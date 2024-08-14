@@ -2,7 +2,7 @@ name: pnpm build test for merge on devlop
 
 on:
   pull_request:
-    branches: [develop]
+    branches: ["develop"]
 
 jobs:
   build:

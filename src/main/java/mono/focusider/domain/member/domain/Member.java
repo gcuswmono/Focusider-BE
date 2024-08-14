@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import mono.focusider.domain.attendance.domain.Attendance;
 import mono.focusider.domain.auth.dto.req.SignupRequestDto;
+import mono.focusider.domain.category.domain.MemberCategory;
 import mono.focusider.domain.member.type.MemberRole;
 import mono.focusider.domain.member.type.converter.MemberRoleConverter;
 import mono.focusider.global.domain.BaseTimeEntity;
@@ -22,6 +23,8 @@ public class Member extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "profile_image")
+    private String profileImage;
     @Column(name = "account_id", nullable = false)
     private String accountId;
     @Column(name = "password", nullable = false)
@@ -39,7 +42,11 @@ public class Member extends BaseTimeEntity {
     @Convert(converter = MemberRoleConverter.class)
     private MemberRole memberRole;
 
-    @OneToMany(mappedBy = "member",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<MemberCategory> memberCategories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Attendance> attendances = new ArrayList<>();
 
@@ -54,5 +61,9 @@ public class Member extends BaseTimeEntity {
                 .level(0)
                 .memberRole(MemberRole.ROLE_MEMBER)
                 .build();
+    }
+
+    public void addMemberCategory(MemberCategory memberCategory) {
+        this.memberCategories.add(memberCategory);
     }
 }

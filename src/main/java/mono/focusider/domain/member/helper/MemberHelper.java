@@ -18,4 +18,9 @@ public class MemberHelper {
         return memberRepository.findByAccountId(accountId)
                 .orElseThrow(() -> new EntityNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
+
+    public Member findMemberByIdOrThrow(Long id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+    }
 }

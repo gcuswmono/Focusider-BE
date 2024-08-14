@@ -1,4 +1,4 @@
-package mono.focusider.global.config;
+package mono.focusider.global.config.swagger;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;

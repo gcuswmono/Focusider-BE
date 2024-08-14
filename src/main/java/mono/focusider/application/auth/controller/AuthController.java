@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.auth.dto.req.LoginRequestDto;
 import mono.focusider.domain.auth.dto.req.SignupRequestDto;
@@ -20,9 +21,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/auth")
 @Tag(name = "Authentication", description = "Authentication API")
+@RequiredArgsConstructor
 public class AuthController {
-        @Autowired
-        private AuthService authService;
+        private final AuthService authService;
 
         @Operation(summary = "Sign up a new user", description = "Register a new user with username and password", responses = {
                         @ApiResponse(responseCode = "200", description = "User registered successfully"),

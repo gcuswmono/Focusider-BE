@@ -40,24 +40,8 @@ public class AuthService {
         authValidator.validatePassword(loginRequestDto.password(), member.getPassword(), passwordEncoder);
         AuthUserInfo authUserInfo = AuthUserInfo.of(member);
         String accessToken = jwtUtil.createAccessToken(authUserInfo);
+        String refreshToken = jwtUtil.createRefreshToken(authUserInfo);
+        jwtUtil.addRedisTokenInfo(refreshToken, accessToken);
         jwtUtil.addAccessTokenToCookie(response, accessToken);
     }
-
-//    public AuthResponseDto refreshToken(String refreshToken) {
-//        String username = jwtTokenUtil.getUsernameFromToken(refreshToken);
-//        String storedRefreshToken = redisTemplate.opsForValue().get(username);
-//
-//        if (storedRefreshToken != null && storedRefreshToken.equals(refreshToken)) {
-//            String newAccessToken = jwtTokenUtil.generateAccessToken(username);
-//            log.info("Token refreshed for user: {}", username);
-//            return new AuthResponseDto(newAccessToken, refreshToken);
-//        } else {
-//            log.warn("Invalid refresh token attempt for user: {}", username);
-//            throw new InvalidRefreshTokenException("Invalid refresh token");
-//        }
-//    }
-//
-//    public boolean isUsernameAvailable(String username) {
-//        return !memberRepository.existsByUsername(username);
-//    }
 }

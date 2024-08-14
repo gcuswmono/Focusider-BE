@@ -16,7 +16,7 @@ public class Keyword {
     @Column(name = "keyword_id", nullable = false)
     private Long id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "keyword_type", nullable = false)
     @Convert(converter = KeywordTypeConverter.class)
     private KeywordType keywordType;
 }

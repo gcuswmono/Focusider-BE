@@ -18,6 +18,8 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+import static mono.focusider.global.security.JwtEnum.*;
+
 @Getter
 @RequiredArgsConstructor
 @Component
@@ -48,9 +50,6 @@ public class JwtUtil {
     private String createToken(AuthUserInfo authUserInfo, Long expireTime) {
         return Jwts.builder()
                 .claim("memberId", authUserInfo.memberId())
-                .claim("name", authUserInfo.name())
-                .claim("gender", authUserInfo.gender())
-                .claim("level", authUserInfo.level())
                 .claim("memberRole", authUserInfo.memberRole())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expireTime))
@@ -93,7 +92,7 @@ public class JwtUtil {
     }
 
     public void addAccessTokenToCookie(HttpServletResponse response, String accessToken) {
-        Cookie accessTokenCookie = CookieUtils.createCookie("accessToken", accessToken);
+        Cookie accessTokenCookie = CookieUtils.createCookie(ACCESS_TOKEN_NAME.getDesc(), accessToken);
         CookieUtils.addCookieWithMaxAge(response, accessTokenCookie, Math.toIntExact(accessTokenExpireTime));
     }
 

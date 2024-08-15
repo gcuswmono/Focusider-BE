@@ -2,37 +2,40 @@ package mono.focusider.domain.auth.service;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.auth.dto.info.AuthUserInfo;
 import mono.focusider.domain.auth.dto.req.LoginRequestDto;
 import mono.focusider.domain.auth.dto.req.SignupRequestDto;
 import mono.focusider.domain.auth.helper.AuthHelper;
-import mono.focusider.domain.auth.mapper.AuthMapper;
 import mono.focusider.domain.auth.validator.AuthValidator;
+import mono.focusider.domain.file.domain.File;
+import mono.focusider.domain.file.helper.FileHelper;
 import mono.focusider.domain.member.domain.Member;
 import mono.focusider.domain.member.helper.MemberHelper;
-import org.springframework.data.redis.core.RedisTemplate;
+import mono.focusider.global.security.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import lombok.extern.slf4j.Slf4j;
-import mono.focusider.global.security.JwtUtil;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AuthService {
     private final AuthValidator authValidator;
     private final PasswordEncoder passwordEncoder;
     private final MemberHelper memberHelper;
+    private final FileHelper fileHelper;
     private final JwtUtil jwtUtil;
-    private final RedisTemplate<String, String> redisTemplate;
     private final AuthHelper authHelper;
-    private final AuthMapper authMapper;
 
+    @Transactional
     public void signup(SignupRequestDto signupRequestDto) {
         authValidator.checkAccountId(signupRequestDto.accountId());
         String password = passwordEncoder.encode(signupRequestDto.password());
-        authHelper.createMemberAndSave(signupRequestDto, password);
+        File profileImageFile = fileHelper.findFileByUrl(signupRequestDto.profileImage());
+        authHelper.createMemberAndSave(signupRequestDto, profileImageFile, password);
+        profileImageFile.updateUsed();
     }
 
     public void login(LoginRequestDto loginRequestDto, HttpServletResponse response) {

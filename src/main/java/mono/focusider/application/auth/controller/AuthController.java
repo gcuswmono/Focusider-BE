@@ -10,12 +10,13 @@ import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.auth.dto.req.LoginRequestDto;
 import mono.focusider.domain.auth.dto.req.SignupRequestDto;
 import mono.focusider.domain.auth.service.AuthService;
-
 import mono.focusider.global.domain.SuccessResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -30,8 +31,8 @@ public class AuthController {
                         @ApiResponse(responseCode = "400", description = "Bad request - Invalid input")
         })
         @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-        public ResponseEntity<SuccessResponse<?>> signup(@Valid @RequestBody SignupRequestDto signupRequest) {
-                authService.signup(signupRequest);
+        public ResponseEntity<SuccessResponse<?>> signup(@Valid @RequestBody SignupRequestDto requestDto) {
+                authService.signup(requestDto);
                 return SuccessResponse.ok(null);
         }
 

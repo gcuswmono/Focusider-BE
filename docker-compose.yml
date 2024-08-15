@@ -1,16 +1,16 @@
 version: "3"
 services:
-  mysql:
-    container_name: mysql
-    image: mysql:8.0.30
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
     restart: on-failure
     ports:
       - "3306:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD=1234
-      - MYSQL_DATABASE=api
-      - MYSQL_USER=api
-      - MYSQL_PASSWORD=api
+      - MYSQL_ROOT_PASSWORD=focusider!
+      - MYSQL_DATABASE=focusider
+      - MYSQL_USER=focusider
+      - MYSQL_PASSWORD=focusider!
       - TZ=Asia/Seoul
     command:
       - --character-set-server=utf8mb4
@@ -42,6 +42,6 @@ services:
       mysql:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/api
-      SPRING_DATASOURCE_USERNAME: "api"
-      SPRING_DATASOURCE_PASSWORD: "api"
+      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/focusider
+      SPRING_DATASOURCE_USERNAME: "focusider"
+      SPRING_DATASOURCE_PASSWORD: "focusider!"

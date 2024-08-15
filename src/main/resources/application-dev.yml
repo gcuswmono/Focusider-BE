@@ -1,7 +1,7 @@
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mariadb://mariadb:3306/focusider?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://3.38.179.245:3306/focusider?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
     username: focusider
     password: "focusider!"
 
@@ -19,8 +19,9 @@ spring:
         default-page-size: 10
         one-indexed-parameters: true
     redis:
-      host: redis
+      host: 3.38.179.245
       port: 6379
+      password: focusider!
     rest:
       detection-strategy: annotated
 

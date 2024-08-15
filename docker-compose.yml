@@ -4,6 +4,8 @@ services:
     container_name: mysql
     image: mysql:8.0.30
     restart: on-failure
+    ports:
+      - "3306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=1234
       - MYSQL_DATABASE=api
@@ -25,6 +27,8 @@ services:
   redis:
     image: redis:latest
     container_name: redis
+    ports:
+      - "6397:6397"
     restart: always
     volumes:
       - ./redis_data:/data

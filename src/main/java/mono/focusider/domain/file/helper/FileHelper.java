@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import static mono.focusider.domain.file.error.FileErrorCode.FILE_NOT_FOUND;
+import static mono.focusider.domain.file.type.FileStatus.NOT_USED;
 
 @Component
 @RequiredArgsConstructor
@@ -24,7 +25,7 @@ public class FileHelper {
 
     public File uploadFile(MultipartFile file) {
         String url = s3Utils.uploadFile(FileType.MEMBER_PROFILE_IMAGE, file);
-        return fileRepository.save(File.createFile(url, false));
+        return fileRepository.save(File.createFile(url, NOT_USED.getIsUsed()));
     }
 
     public File findFileByUrl(String url) {

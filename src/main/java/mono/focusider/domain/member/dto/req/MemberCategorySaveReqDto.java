@@ -4,7 +4,7 @@ import mono.focusider.domain.category.type.CategoryType;
 
 import java.util.List;
 
-public record MemberCategorySaveReq(
+public record MemberCategorySaveReqDto(
         List<CategoryType> categoryTypes
 ) {
 }

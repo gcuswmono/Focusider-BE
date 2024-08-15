@@ -7,7 +7,6 @@ import mono.focusider.global.security.JwtUtil;
 import mono.focusider.global.utils.redis.RedisUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,9 +25,7 @@ public class SecurityConfig {
     private final AuthMapper authMapper;
     private final RedisUtils redisUtils;
 
-    private static final String[] whiteList = {"/api/auth/login", "/v3/**", "/swagger-ui/**"};
-//    private static final String[] whiteListGET = {"/api/wkt", "/api/review", "/api/banner"};
-//    private static final String[] whiteListPatch = {"/api/member"};
+    private static final String[] whiteList = {"/api/auth/login", "/api/file", "/v3/**", "/swagger-ui/**"};
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {

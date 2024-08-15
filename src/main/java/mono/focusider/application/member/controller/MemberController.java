@@ -5,8 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mono.focusider.domain.category.type.CategoryType;
-import mono.focusider.domain.member.dto.req.MemberCategorySaveReq;
+import mono.focusider.domain.member.dto.req.MemberCategorySaveReqDto;
 import mono.focusider.domain.member.service.MemberService;
 import mono.focusider.global.annotation.MemberInfo;
 import mono.focusider.global.aspect.member.MemberInfoParam;
@@ -16,8 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -32,7 +29,7 @@ public class MemberController {
             @ApiResponse(responseCode = "500", description = "에러")
     })
     @PostMapping("/add")
-    public ResponseEntity<SuccessResponse<?>> add(@RequestBody MemberCategorySaveReq req,
+    public ResponseEntity<SuccessResponse<?>> add(@RequestBody MemberCategorySaveReqDto req,
                                                   @MemberInfo MemberInfoParam memberInfo) {
         log.info("memberId= {}", memberInfo.memberId());
         memberService.createMemberCategory(req, memberInfo);

@@ -5,6 +5,21 @@ plugins {
     id 'com.google.cloud.tools.jib' version '3.4.3'
 }
 
+bootRun {
+    // spring.profiles.active가 설정되었으면 그 값을 사용하고, 설정되지 않았으면 'dev' 사용
+    systemProperty 'spring.profiles.active', System.getProperty('spring.profiles.active') ?: 'dev'
+}
+
+task copyYml(type: Copy) {
+    // spring.profiles.active가 설정되었으면 그 값을 사용하고, 설정되지 않았으면 'dev' 사용
+    from("src/main/resources/application-${System.getProperty('spring.profiles.active') ?: 'dev'}.yml")
+    into("build/resources/main")
+    rename { fileName ->
+        'application.yml'
+    }
+}
+
+
 group = 'mono.focusider'
 version = '0.0.1-SNAPSHOT'
 

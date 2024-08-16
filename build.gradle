@@ -27,14 +27,14 @@ jib {
     from {
         image = 'amazoncorretto:21-alpine3.18-jdk'
     }
-    // to {
-    //     image = 'docker.io/mango0422/focusider'
-    //     tags = [project.findProperty('jib.to.tags') ?: 'latest']
-    //     auth {
-    //         username = System.getenv('DOCKERHUB_USERNAME')
-    //         password = System.getenv('DOCKERHUB_ACCESS_TOKEN')
-    //     }
-    // }
+    to {
+        image = 'docker.io/mango0422/focusider'
+        tags = [project.findProperty('jib.to.tags') ?: 'latest']
+        auth {
+            username = System.getenv('DOCKERHUB_USERNAME')
+            password = System.getenv('DOCKERHUB_ACCESS_TOKEN')
+        }
+    }
     container {
         ports = ['8080']
         jvmFlags = ['-Xms512m', '-Xmx512m', '-Dspring.profiles.active=prod']

@@ -16,7 +16,7 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       timeout: 40s
       retries: 10
     volumes:

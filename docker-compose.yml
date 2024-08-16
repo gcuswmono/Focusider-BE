@@ -39,7 +39,7 @@ services:
       - "8080:8080"
     image: mango0422/focusider:latest
     depends_on:
-      mysql:
+      mariadb:
         condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/focusider

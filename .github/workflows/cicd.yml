@@ -26,7 +26,7 @@ jobs:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
         run: |
-          ./gradlew jib -Djib.to.auth.username=$DOCKERHUB_USERNAME -Djib.to.auth.password=$DOCKERHUB_ACCESS_TOKEN -x test
+          ./gradlew jib -Djib.to.auth.username=$DOCKERHUB_USERNAME -Djib.to.auth.password=$DOCKERHUB_ACCESS_TOKEN -x test -Dspring.profiles.active=prod
 
       - name: Docker Login and Deploy Docker Container
         run: |

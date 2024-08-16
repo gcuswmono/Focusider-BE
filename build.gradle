@@ -14,7 +14,9 @@ jib {
     }
     to {
         image = 'docker.io/mango0422/focusider'
-        tags = [project.findProperty('jib.to.tags') ?: 'latest']
+        // 'jib.to.tags'가 없으면 빌드 번호 또는 'latest'를 사용
+        tags = [project.findProperty('jib.to.tags') ?: (System.getenv('BUILD_NUMBER') ?: 'latest')]
+        
         auth {
             username = System.getenv('DOCKERHUB_USERNAME')
             password = System.getenv('DOCKERHUB_ACCESS_TOKEN')
@@ -32,6 +34,7 @@ jib {
         format = 'Docker'
     }
 }
+
 
 
 java {

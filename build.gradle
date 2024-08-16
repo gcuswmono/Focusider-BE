@@ -20,14 +20,19 @@ jib {
             password = System.getenv('DOCKERHUB_ACCESS_TOKEN')
         }
     }
-    container(({
+    container {
         ports = ['8080']
         jvmFlags = ['-Xms512m', '-Xmx512m', '-Dspring.profiles.active=prod']
         environment = [SPRING_OUTPUT_ANSI_ENABLED: "ALWAYS"]
-        labels = [Iversion: project.version, name: project.name, group: project.group]
+        labels = [
+            version: project.version, 
+            name: project.name, 
+            group: project.group
+        ]
         format = 'Docker'
-    } as Class<Object>))
+    }
 }
+
 
 java {
     toolchain {

@@ -42,9 +42,6 @@ services:
     ports:
       - "8080:8080"
     image: mango0422/focusider:latest
-    depends_on:
-      mariadb:
-        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/focusider
       SPRING_DATASOURCE_USERNAME: "focusider"

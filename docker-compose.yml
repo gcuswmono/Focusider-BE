@@ -38,7 +38,7 @@ services:
       - focusider-network
 
   focusider:
-    container_name: spring
+    container_name: focusider
     ports:
       - "8080:8080"
     image: mango0422/focusider:latest

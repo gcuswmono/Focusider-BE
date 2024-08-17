@@ -1,9 +1,5 @@
 package mono.focusider.domain.member.domain;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
 import jakarta.persistence.*;
 import lombok.*;
 import mono.focusider.domain.attendance.domain.Attendance;
@@ -12,6 +8,10 @@ import mono.focusider.domain.category.domain.MemberCategory;
 import mono.focusider.domain.member.type.MemberRole;
 import mono.focusider.domain.member.type.converter.MemberRoleConverter;
 import mono.focusider.global.domain.BaseTimeEntity;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -65,5 +65,9 @@ public class Member extends BaseTimeEntity {
 
     public void addMemberCategory(MemberCategory memberCategory) {
         this.memberCategories.add(memberCategory);
+    }
+
+    public void updateMemberLevel(Integer level) {
+        this.level = level;
     }
 }

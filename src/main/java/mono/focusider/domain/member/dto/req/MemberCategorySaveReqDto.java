@@ -6,7 +6,7 @@ import mono.focusider.domain.member.type.ReadingTermType;
 
 import java.util.List;
 
-public record MemberCategorySaveReq(
+public record MemberCategorySaveReqDto(
         ReadingTermType readingTermType,
         ReadingHardType readingHardType,
         List<CategoryType> categoryTypes

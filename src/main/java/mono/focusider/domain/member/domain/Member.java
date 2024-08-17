@@ -5,6 +5,7 @@ import lombok.*;
 import mono.focusider.domain.attendance.domain.Attendance;
 import mono.focusider.domain.auth.dto.req.SignupRequestDto;
 import mono.focusider.domain.category.domain.MemberCategory;
+import mono.focusider.domain.file.domain.File;
 import mono.focusider.domain.member.type.MemberRole;
 import mono.focusider.domain.member.type.converter.MemberRoleConverter;
 import mono.focusider.global.domain.BaseTimeEntity;
@@ -22,9 +23,6 @@ public class Member extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "profile_image")
-    private String profileImage;
     @Column(name = "account_id", nullable = false)
     private String accountId;
     @Column(name = "password", nullable = false)
@@ -38,6 +36,10 @@ public class Member extends BaseTimeEntity {
     @Column(name = "level", nullable = false)
     private Integer level;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_image_id")
+    private File profileImageFile;
+
     @Column(name = "member_role", nullable = false)
     @Convert(converter = MemberRoleConverter.class)
     private MemberRole memberRole;
@@ -50,7 +52,7 @@ public class Member extends BaseTimeEntity {
     @Builder.Default
     private List<Attendance> attendances = new ArrayList<>();
 
-    public static Member createMember(SignupRequestDto signupRequestDto, String password) {
+    public static Member createMember(SignupRequestDto signupRequestDto, File profileImageFile, String password) {
         return Member
                 .builder()
                 .accountId(signupRequestDto.accountId())
@@ -58,6 +60,7 @@ public class Member extends BaseTimeEntity {
                 .name(signupRequestDto.name())
                 .gender(signupRequestDto.gender())
                 .birthDate(signupRequestDto.birthday())
+                .profileImageFile(profileImageFile)
                 .level(0)
                 .memberRole(MemberRole.ROLE_MEMBER)
                 .build();

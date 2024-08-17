@@ -24,14 +24,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
     private final MemberService memberService;
 
-    @Operation(summary = "카테고리 설정", description = "유저 카테고리 설정", responses = {
-            @ApiResponse(responseCode = "200", description = "카테고리 설정 완료"),
+    @Operation(summary = "카테고리 및 레벨 설정", description = "유저 프로필 설정", responses = {
+            @ApiResponse(responseCode = "200", description = "프로필 설정 완료"),
             @ApiResponse(responseCode = "500", description = "에러")
     })
     @PostMapping("/add")
     public ResponseEntity<SuccessResponse<?>> add(@RequestBody MemberCategorySaveReqDto req,
                                                   @MemberInfo MemberInfoParam memberInfo) {
-        log.info("memberId= {}", memberInfo.memberId());
         memberService.createMemberCategory(req, memberInfo);
         return SuccessResponse.ok(null);
     }

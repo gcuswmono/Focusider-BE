@@ -1,9 +1,9 @@
 spring:
   datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://mariadb:3306/focusider
-    username: focusider
-    password: "focusider!"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/focuside?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    username: root
+    password: '1918'
 
   servlet:
     multipart:
@@ -19,15 +19,15 @@ spring:
         default-page-size: 10
         one-indexed-parameters: true
     redis:
-      host: redis
+      host: localhost
       port: 6379
-      password: focusider!
+      password:
     rest:
       detection-strategy: annotated
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         #show_sql: true
@@ -42,16 +42,16 @@ spring:
 cloud:
   aws:
     s3:
-      bucket: mongdol-s3
-      upload-path: https://mongdol-s3.s3.ap-northeast-2.amazonaws.com
+      bucket: focusider
+      upload-path: https://focusider-s3.s3.ap-northeast-2.amazonaws.com
     region:
       static: ap-northeast-2
       auto: false
     stack:
       auto: false
     credentials:
-      access-key: AKIAS64YBSCO3KNW5IMX
-      secret-key: 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
+      access-key: AKIA6GBMDCUSSCFIK2VH
+      secret-key: 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
 
 logging.level:
   org.hibernate.SQL: DEBUG

@@ -69,4 +69,8 @@ public class Member extends BaseTimeEntity {
     public void addMemberCategory(MemberCategory memberCategory) {
         this.memberCategories.add(memberCategory);
     }
+
+    public void updateMemberLevel(Integer level) {
+        this.level = level;
+    }
 }

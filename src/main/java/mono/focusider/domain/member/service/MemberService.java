@@ -37,9 +37,9 @@ public class MemberService {
         member.updateMemberLevel(level);
     }
 
-    private Integer settingLevel(MemberCategorySaveReqDto memberCategorySaveReq) {
-        ReadingTermType readingTermType = memberCategorySaveReq.readingTermType();
-        ReadingHardType readingHardType = memberCategorySaveReq.readingHardType();
+    private Integer settingLevel(MemberCategorySaveReqDto memberCategorySaveReqDto) {
+        ReadingTermType readingTermType = memberCategorySaveReqDto.readingTermType();
+        ReadingHardType readingHardType = memberCategorySaveReqDto.readingHardType();
         return (int) Math.ceil((double) (readingTermType.getCode() * readingHardType.getCode()) / 3);
     }
 }

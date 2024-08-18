@@ -2,6 +2,7 @@ package mono.focusider.domain.quiz.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import mono.focusider.domain.member.domain.Member;
 import mono.focusider.domain.quiz.type.QuizStatusType;
 import mono.focusider.domain.quiz.type.converter.QuizStatusTypeConverter;
 import mono.focusider.global.domain.BaseTimeEntity;
@@ -19,6 +20,10 @@ public class QuizAttempt extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "quiz_id", nullable = false)
     private Quiz quiz;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @Column(name = "correct", nullable = false)
     @Convert(converter = QuizStatusTypeConverter.class)

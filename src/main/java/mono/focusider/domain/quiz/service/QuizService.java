@@ -5,7 +5,11 @@ import mono.focusider.domain.quiz.domain.Commentary;
 import mono.focusider.domain.quiz.domain.Keyword;
 import mono.focusider.domain.quiz.domain.Quiz;
 import mono.focusider.domain.quiz.dto.info.QuizSetInfo;
+import mono.focusider.domain.quiz.dto.res.QuizInfo;
 import mono.focusider.domain.quiz.helper.*;
+import mono.focusider.domain.quiz.mapper.ChoiceMapper;
+import mono.focusider.domain.quiz.mapper.QuizMapper;
+import mono.focusider.global.aspect.member.MemberInfoParam;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +24,12 @@ public class QuizService {
     private final QuizKeywordHelper quizKeywordHelper;
     private final KeywordHelper keywordHelper;
     private final ChoiceHelper choiceHelper;
+    private final ChoiceMapper choiceMapper;
+    private final QuizMapper quizMapper;
+
+    public QuizInfo findQuizByLevel(MemberInfoParam memberInfoParam) {
+        return quizHelper.findQuizInfoByLevelAndMemberId(memberInfoParam.memberLevel(), memberInfoParam.memberId());
+    }
 
     @Transactional
     public void createAndSaveQuiz(QuizSetInfo quizSetInfo) {
@@ -29,7 +39,7 @@ public class QuizService {
         keywords.forEach(keyword -> {
             quizKeywordHelper.createAndSaveQuizKeyword(quiz, keyword);
         });
-        quizSetInfo.choiceInfos().forEach(choiceInfo -> {
+        quizSetInfo.choiceSetInfos().forEach(choiceInfo -> {
             choiceHelper.createAndSaveChoice(quiz, choiceInfo);
         });
     }

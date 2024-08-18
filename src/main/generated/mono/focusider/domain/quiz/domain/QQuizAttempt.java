@@ -32,6 +32,8 @@ public class QQuizAttempt extends EntityPathBase<QuizAttempt> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> lastModifiedAt = _super.lastModifiedAt;
 
+    public final mono.focusider.domain.member.domain.QMember member;
+
     public final QQuiz quiz;
 
     public final EnumPath<mono.focusider.domain.quiz.type.QuizStatusType> quizStatusType = createEnum("quizStatusType", mono.focusider.domain.quiz.type.QuizStatusType.class);
@@ -54,6 +56,7 @@ public class QQuizAttempt extends EntityPathBase<QuizAttempt> {
 
     public QQuizAttempt(Class<? extends QuizAttempt> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.member = inits.isInitialized("member") ? new mono.focusider.domain.member.domain.QMember(forProperty("member"), inits.get("member")) : null;
         this.quiz = inits.isInitialized("quiz") ? new QQuiz(forProperty("quiz"), inits.get("quiz")) : null;
     }
 

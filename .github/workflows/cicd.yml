@@ -31,6 +31,6 @@ jobs:
       - name: Docker Login and Deploy Docker Container
         run: |
           echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-          docker rm -f focusider
+          docker compose stop focusider
           docker compose pull focusider
           docker compose up -d focusider

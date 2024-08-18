@@ -5,7 +5,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import mono.focusider.domain.quiz.dto.info.ChoiceInfo;
-import mono.focusider.domain.quiz.dto.res.QuizInfo;
+import mono.focusider.domain.quiz.dto.res.QuizGetResDto;
 
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.list;
@@ -18,7 +18,7 @@ public class QuizQueryRepositoryImpl implements QuizQueryRepository{
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public QuizInfo findByLevelAndMemberId(int level, long memberId) {
+    public QuizGetResDto findByLevelAndMemberId(int level, long memberId) {
         return queryFactory
                 .from(quiz)
                 .leftJoin(quiz.choices, choice)
@@ -26,7 +26,7 @@ public class QuizQueryRepositoryImpl implements QuizQueryRepository{
                 .where(quiz.level.eq(level).and(quizAttempt.isNull().or(quizAttempt.member.id.ne(memberId))))
                 .orderBy(Expressions.numberTemplate(Double.class, "RAND()").asc())
                 .transform(groupBy(quiz.id).as(
-                        Projections.constructor(QuizInfo.class,
+                        Projections.constructor(QuizGetResDto.class,
                                 quiz.id,
                                 quiz.title,
                                 quiz.content,

@@ -19,9 +19,17 @@ public class QCommentary extends EntityPathBase<Commentary> {
 
     public static final QCommentary commentary = new QCommentary("commentary");
 
+    public final mono.focusider.global.domain.QBaseTimeEntity _super = new mono.focusider.global.domain.QBaseTimeEntity(this);
+
     public final StringPath content = createString("content");
 
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> lastModifiedAt = _super.lastModifiedAt;
 
     public QCommentary(String variable) {
         super(Commentary.class, forVariable(variable));

@@ -48,7 +48,7 @@ public class QChoice extends EntityPathBase<Choice> {
 
     public QChoice(Class<? extends Choice> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.quiz = inits.isInitialized("quiz") ? new QQuiz(forProperty("quiz")) : null;
+        this.quiz = inits.isInitialized("quiz") ? new QQuiz(forProperty("quiz"), inits.get("quiz")) : null;
     }
 
 }

@@ -11,7 +11,9 @@ public enum CategoryType implements EnumField {
     ART(1, "예술"),
     SCIENCE(2, "과학"),
     SOCIETY(3, "사회"),
-    TECHNOLOGY(4, "기술");
+    TECHNOLOGY(4, "기술"),
+    HUMANITIES(5, "인문"),
+    AMALGAMATION(6, "융합");
 
     private final Integer code;
     private final String desc;

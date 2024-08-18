@@ -34,6 +34,8 @@ public class QuizController {
         return SuccessResponse.ok(result);
     }
 
+
+
     @PostMapping("/make")
     public ResponseEntity<SuccessResponse<?>> makeQuiz(@RequestBody QuizSetInfo quizSetInfo) {
         quizService.createAndSaveQuiz(quizSetInfo);

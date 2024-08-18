@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import mono.focusider.global.annotation.MemberInfo;
 import mono.focusider.global.error.code.GlobalErrorCode;
 import mono.focusider.global.error.exception.UnauthorizedException;
-import mono.focusider.global.security.JwtEnum;
 import mono.focusider.global.security.JwtUtil;
 import mono.focusider.global.utils.cookie.CookieUtils;
 import org.springframework.core.MethodParameter;
@@ -16,7 +15,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import static mono.focusider.global.security.JwtEnum.*;
+import static mono.focusider.global.security.JwtEnum.ACCESS_TOKEN_NAME;
 
 @RequiredArgsConstructor
 @Component
@@ -37,7 +36,8 @@ public class MemberInfoParamHandlerArgumentResolver implements HandlerMethodArgu
             throw new UnauthorizedException(GlobalErrorCode.INVALID_TOKEN);
         }
         Long memberId = jwtUtil.getMemberId(accessToken);
+        Integer memberLevel = jwtUtil.getMemberLevel(accessToken);
         String memberRole = jwtUtil.getMemberRole(accessToken);
-        return MemberInfoParam.of(memberId, memberRole);
+        return MemberInfoParam.of(memberId, memberLevel, memberRole);
     }
 }

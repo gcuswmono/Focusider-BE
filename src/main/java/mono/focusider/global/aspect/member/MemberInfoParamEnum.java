@@ -8,6 +8,7 @@ import lombok.Getter;
 @Getter
 public enum MemberInfoParamEnum {
     MEMBER_ID("memberId"),
+    MEMBER_LEVEL("memberLevel"),
     MEMBER_ROLE("memberRole");
 
     private final String desc;

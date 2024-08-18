@@ -1,7 +1,7 @@
 package mono.focusider.domain.quiz.repository;
 
-import mono.focusider.domain.quiz.dto.res.QuizInfo;
+import mono.focusider.domain.quiz.dto.res.QuizGetResDto;
 
 public interface QuizQueryRepository {
-    QuizInfo findByLevelAndMemberId(int level, long memberId);
+    QuizGetResDto findByLevelAndMemberId(int level, long memberId);
 }

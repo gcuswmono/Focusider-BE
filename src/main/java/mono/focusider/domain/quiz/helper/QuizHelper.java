@@ -3,7 +3,7 @@ package mono.focusider.domain.quiz.helper;
 import lombok.RequiredArgsConstructor;
 import mono.focusider.domain.quiz.domain.Commentary;
 import mono.focusider.domain.quiz.domain.Quiz;
-import mono.focusider.domain.quiz.dto.res.QuizInfo;
+import mono.focusider.domain.quiz.dto.res.QuizGetResDto;
 import mono.focusider.domain.quiz.repository.QuizRepository;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +16,7 @@ public class QuizHelper {
         return quizRepository.save(Quiz.of(title, content, level, commentary));
     }
 
-    public QuizInfo findQuizInfoByLevelAndMemberId(int level, Long memberId) {
+    public QuizGetResDto findQuizInfoByLevelAndMemberId(int level, Long memberId) {
         return quizRepository.findByLevelAndMemberId(level, memberId);
     }
 }

@@ -10,6 +10,6 @@ public record QuizSetInfo(
         Integer level,
         CommentaryInfo commentaryInfo,
         List<KeywordType> keywordTypes,
-        List<ChoiceInfo> choiceInfos
+        List<ChoiceSetInfo> choiceSetInfos
 ) {
 }

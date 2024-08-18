@@ -27,6 +27,7 @@ public class QuizQueryRepositoryImpl implements QuizQueryRepository{
                 .orderBy(Expressions.numberTemplate(Double.class, "RAND()").asc())
                 .transform(groupBy(quiz.id).as(
                         Projections.constructor(QuizInfo.class,
+                                quiz.id,
                                 quiz.title,
                                 quiz.content,
                                 list(Projections.constructor(ChoiceInfo.class,

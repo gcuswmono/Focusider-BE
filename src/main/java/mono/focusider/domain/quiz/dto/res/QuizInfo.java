@@ -9,6 +9,7 @@ import java.util.List;
 
 @Builder(access = AccessLevel.PRIVATE)
 public record QuizInfo(
+        Long quizId,
         String title,
         String content,
         List<ChoiceInfo> choiceContent
@@ -16,6 +17,7 @@ public record QuizInfo(
     public static QuizInfo of(Quiz quiz, List<ChoiceInfo> choiceInfos) {
         return QuizInfo
                 .builder()
+                .quizId(quiz.getId())
                 .title(quiz.getTitle())
                 .content(quiz.getContent())
                 .choiceContent(choiceInfos)

@@ -23,26 +23,26 @@ task copyYml(type: Copy) {
 group = 'mono.focusider'
 version = '0.0.1-SNAPSHOT'
 
-jib {
-    from {
-        image = 'amazoncorretto:21-alpine3.18-jdk'
-    }
-    to {
-        image = 'docker.io/mango0422/focusider'
-        tags = [project.findProperty('jib.to.tags') ?: 'latest']
-        auth {
-            username = System.getenv('DOCKERHUB_USERNAME')
-            password = System.getenv('DOCKERHUB_ACCESS_TOKEN')
-        }
-    }
-    container {
-        ports = ['8080']
-        jvmFlags = ['-Xms512m', '-Xmx512m', '-Dspring.profiles.active=prod']
-        environment = [SPRING_OUTPUT_ANSI_ENABLED: "ALWAYS"]
-        labels = [Iversion: project.version, name: project.name, group: project.group]
-        format = 'Docker'
-    }
-}
+//jib {
+//    from {
+//        image = 'amazoncorretto:21-alpine3.18-jdk'
+//    }
+//    to {
+//        image = 'docker.io/mango0422/focusider'
+//        tags = [project.findProperty('jib.to.tags') ?: 'latest']
+//        auth {
+//            username = System.getenv('DOCKERHUB_USERNAME')
+//            password = System.getenv('DOCKERHUB_ACCESS_TOKEN')
+//        }
+//    }
+//    container {
+//        ports = ['8080']
+//        jvmFlags = ['-Xms512m', '-Xmx512m', '-Dspring.profiles.active=prod']
+//        environment = [SPRING_OUTPUT_ANSI_ENABLED: "ALWAYS"]
+//        labels = [Iversion: project.version, name: project.name, group: project.group]
+//        format = 'Docker'
+//    }
+//}
 
 
 

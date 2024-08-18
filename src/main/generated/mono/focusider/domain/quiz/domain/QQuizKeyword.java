@@ -22,9 +22,17 @@ public class QQuizKeyword extends EntityPathBase<QuizKeyword> {
 
     public static final QQuizKeyword quizKeyword = new QQuizKeyword("quizKeyword");
 
+    public final mono.focusider.global.domain.QBaseTimeEntity _super = new mono.focusider.global.domain.QBaseTimeEntity(this);
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final QKeyword keyword;
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> lastModifiedAt = _super.lastModifiedAt;
 
     public final QQuiz quiz;
 

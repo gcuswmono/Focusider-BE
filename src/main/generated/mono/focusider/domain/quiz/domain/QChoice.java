@@ -22,11 +22,19 @@ public class QChoice extends EntityPathBase<Choice> {
 
     public static final QChoice choice = new QChoice("choice");
 
+    public final mono.focusider.global.domain.QBaseTimeEntity _super = new mono.focusider.global.domain.QBaseTimeEntity(this);
+
     public final StringPath content = createString("content");
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final BooleanPath isAnswer = createBoolean("isAnswer");
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> lastModifiedAt = _super.lastModifiedAt;
 
     public final QQuiz quiz;
 

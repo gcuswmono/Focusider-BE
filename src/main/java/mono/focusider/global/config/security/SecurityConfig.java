@@ -25,7 +25,7 @@ public class SecurityConfig {
     private final AuthMapper authMapper;
     private final RedisUtils redisUtils;
 
-    private static final String[] whiteList = {"/api/auth/login", "/api/file", "/v3/**", "/swagger-ui/**"};
+    private static final String[] whiteList = {"/api/auth/login", "/api/auth/signup", "/api/file", "/api/quiz/make" ,"/v3/**", "/swagger-ui/**"};
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -41,10 +41,8 @@ public class SecurityConfig {
                 .formLogin((auth) -> auth.disable())
                 .httpBasic((auth) -> auth.disable())
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/api/auth/signup", "/api/auth/login", "/api/workation", "/v3/**", "/**")
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated()
+                        .requestMatchers(whiteList).permitAll()
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtFilter(jwtUtil, authMapper, redisUtils), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

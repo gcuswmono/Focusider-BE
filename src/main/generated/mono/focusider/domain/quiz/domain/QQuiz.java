@@ -24,6 +24,8 @@ public class QQuiz extends EntityPathBase<Quiz> {
 
     public final mono.focusider.global.domain.QBaseTimeEntity _super = new mono.focusider.global.domain.QBaseTimeEntity(this);
 
+    public final ListPath<Choice, QChoice> choices = this.<Choice, QChoice>createList("choices", Choice.class, QChoice.class, PathInits.DIRECT2);
+
     public final QCommentary commentary;
 
     public final StringPath content = createString("content");
@@ -37,6 +39,8 @@ public class QQuiz extends EntityPathBase<Quiz> {
     public final DateTimePath<java.time.LocalDateTime> lastModifiedAt = _super.lastModifiedAt;
 
     public final NumberPath<Integer> level = createNumber("level", Integer.class);
+
+    public final ListPath<QuizAttempt, QQuizAttempt> quizAttempts = this.<QuizAttempt, QQuizAttempt>createList("quizAttempts", QuizAttempt.class, QQuizAttempt.class, PathInits.DIRECT2);
 
     public final StringPath title = createString("title");
 

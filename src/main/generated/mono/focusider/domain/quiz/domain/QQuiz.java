@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -17,9 +18,15 @@ public class QQuiz extends EntityPathBase<Quiz> {
 
     private static final long serialVersionUID = -1027048745L;
 
+    private static final PathInits INITS = PathInits.DIRECT2;
+
     public static final QQuiz quiz = new QQuiz("quiz");
 
     public final mono.focusider.global.domain.QBaseTimeEntity _super = new mono.focusider.global.domain.QBaseTimeEntity(this);
+
+    public final QCommentary commentary;
+
+    public final StringPath content = createString("content");
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
@@ -29,18 +36,29 @@ public class QQuiz extends EntityPathBase<Quiz> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> lastModifiedAt = _super.lastModifiedAt;
 
-    public final StringPath name = createString("name");
+    public final NumberPath<Integer> level = createNumber("level", Integer.class);
+
+    public final StringPath title = createString("title");
 
     public QQuiz(String variable) {
-        super(Quiz.class, forVariable(variable));
+        this(Quiz.class, forVariable(variable), INITS);
     }
 
     public QQuiz(Path<? extends Quiz> path) {
-        super(path.getType(), path.getMetadata());
+        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
     public QQuiz(PathMetadata metadata) {
-        super(Quiz.class, metadata);
+        this(metadata, PathInits.getFor(metadata, INITS));
+    }
+
+    public QQuiz(PathMetadata metadata, PathInits inits) {
+        this(Quiz.class, metadata, inits);
+    }
+
+    public QQuiz(Class<? extends Quiz> type, PathMetadata metadata, PathInits inits) {
+        super(type, metadata, inits);
+        this.commentary = inits.isInitialized("commentary") ? new QCommentary(forProperty("commentary")) : null;
     }
 
 }

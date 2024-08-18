@@ -27,4 +27,14 @@ public class Quiz extends BaseTimeEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "commentary_id")
     private Commentary commentary;
+
+    public static Quiz of(String title, String content, Integer level, Commentary commentary) {
+        return Quiz
+                .builder()
+                .title(title)
+                .content(content)
+                .level(level)
+                .commentary(commentary)
+                .build();
+    }
 }

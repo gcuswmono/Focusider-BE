@@ -4,13 +4,14 @@ import jakarta.persistence.*;
 import lombok.*;
 import mono.focusider.domain.quiz.type.KeywordType;
 import mono.focusider.domain.quiz.type.converter.KeywordTypeConverter;
+import mono.focusider.global.domain.BaseTimeEntity;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(access = AccessLevel.PRIVATE)
 @Getter
 @Entity
-public class Keyword {
+public class Keyword extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "keyword_id", nullable = false)

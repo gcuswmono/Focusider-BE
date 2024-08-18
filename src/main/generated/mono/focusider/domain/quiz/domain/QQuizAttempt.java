@@ -22,7 +22,15 @@ public class QQuizAttempt extends EntityPathBase<QuizAttempt> {
 
     public static final QQuizAttempt quizAttempt = new QQuizAttempt("quizAttempt");
 
+    public final mono.focusider.global.domain.QBaseTimeEntity _super = new mono.focusider.global.domain.QBaseTimeEntity(this);
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> lastModifiedAt = _super.lastModifiedAt;
 
     public final QQuiz quiz;
 

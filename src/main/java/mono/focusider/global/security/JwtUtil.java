@@ -50,6 +50,7 @@ public class JwtUtil {
     private String createToken(AuthUserInfo authUserInfo, Long expireTime) {
         return Jwts.builder()
                 .claim("memberId", authUserInfo.memberId())
+                .claim("level", authUserInfo.level())
                 .claim("memberRole", authUserInfo.memberRole())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expireTime))

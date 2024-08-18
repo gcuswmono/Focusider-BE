@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import mono.focusider.global.domain.BaseTimeEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(access = AccessLevel.PRIVATE)
@@ -27,6 +30,14 @@ public class Quiz extends BaseTimeEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "commentary_id")
     private Commentary commentary;
+
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Choice> choices = new ArrayList<>();
+
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<QuizAttempt> quizAttempts = new ArrayList<>();
 
     public static Quiz of(String title, String content, Integer level, Commentary commentary) {
         return Quiz

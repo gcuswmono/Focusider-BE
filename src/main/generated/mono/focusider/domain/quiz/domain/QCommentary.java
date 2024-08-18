@@ -10,37 +10,37 @@ import com.querydsl.core.types.Path;
 
 
 /**
- * QKeyword is a Querydsl query type for Keyword
+ * QCommentary is a Querydsl query type for Commentary
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QKeyword extends EntityPathBase<Keyword> {
+public class QCommentary extends EntityPathBase<Commentary> {
 
-    private static final long serialVersionUID = -935469529L;
+    private static final long serialVersionUID = 2134076075L;
 
-    public static final QKeyword keyword = new QKeyword("keyword");
+    public static final QCommentary commentary = new QCommentary("commentary");
 
     public final mono.focusider.global.domain.QBaseTimeEntity _super = new mono.focusider.global.domain.QBaseTimeEntity(this);
+
+    public final StringPath content = createString("content");
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final EnumPath<mono.focusider.domain.quiz.type.KeywordType> keywordType = createEnum("keywordType", mono.focusider.domain.quiz.type.KeywordType.class);
-
     //inherited
     public final DateTimePath<java.time.LocalDateTime> lastModifiedAt = _super.lastModifiedAt;
 
-    public QKeyword(String variable) {
-        super(Keyword.class, forVariable(variable));
+    public QCommentary(String variable) {
+        super(Commentary.class, forVariable(variable));
     }
 
-    public QKeyword(Path<? extends Keyword> path) {
+    public QCommentary(Path<? extends Commentary> path) {
         super(path.getType(), path.getMetadata());
     }
 
-    public QKeyword(PathMetadata metadata) {
-        super(Keyword.class, metadata);
+    public QCommentary(PathMetadata metadata) {
+        super(Commentary.class, metadata);
     }
 
 }

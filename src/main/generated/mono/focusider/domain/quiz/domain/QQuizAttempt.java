@@ -46,7 +46,7 @@ public class QQuizAttempt extends EntityPathBase<QuizAttempt> {
 
     public QQuizAttempt(Class<? extends QuizAttempt> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.quiz = inits.isInitialized("quiz") ? new QQuiz(forProperty("quiz")) : null;
+        this.quiz = inits.isInitialized("quiz") ? new QQuiz(forProperty("quiz"), inits.get("quiz")) : null;
     }
 
 }

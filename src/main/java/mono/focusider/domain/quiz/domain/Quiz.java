@@ -20,4 +20,11 @@ public class Quiz extends BaseTimeEntity {
 
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     private String content;
+
+    @Column(name = "level", nullable = false)
+    private Integer level;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "commentary_id")
+    private Commentary commentary;
 }

@@ -47,7 +47,7 @@ public class QQuizKeyword extends EntityPathBase<QuizKeyword> {
     public QQuizKeyword(Class<? extends QuizKeyword> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.keyword = inits.isInitialized("keyword") ? new QKeyword(forProperty("keyword")) : null;
-        this.quiz = inits.isInitialized("quiz") ? new QQuiz(forProperty("quiz")) : null;
+        this.quiz = inits.isInitialized("quiz") ? new QQuiz(forProperty("quiz"), inits.get("quiz")) : null;
     }
 
 }

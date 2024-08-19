@@ -8,7 +8,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.quiz.dto.info.QuizSetInfo;
-import mono.focusider.domain.quiz.dto.res.QuizInfo;
+import mono.focusider.domain.quiz.dto.req.QuizCheckReqDto;
+import mono.focusider.domain.quiz.dto.res.QuizCheckResDto;
+import mono.focusider.domain.quiz.dto.res.QuizGetResDto;
 import mono.focusider.domain.quiz.service.QuizService;
 import mono.focusider.global.annotation.MemberInfo;
 import mono.focusider.global.aspect.member.MemberInfoParam;
@@ -25,12 +27,23 @@ public class QuizController {
     private final QuizService quizService;
 
     @Operation(summary = "레벨에 맞는 퀴즈 출력", description = "퀴즈 출력", responses = {
-            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = QuizInfo.class))),
+            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = QuizGetResDto.class))),
             @ApiResponse(responseCode = "500", description = "에러")
     })
     @GetMapping
     public ResponseEntity<SuccessResponse<?>> getQuiz(@MemberInfo MemberInfoParam memberInfoParam) {
-        QuizInfo result = quizService.findQuizByLevel(memberInfoParam);
+        QuizGetResDto result = quizService.findQuizByLevel(memberInfoParam);
+        return SuccessResponse.ok(result);
+    }
+
+    @Operation(summary = "퀴즈 정답 선택", description = "퀴즈 정답 선택", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = QuizCheckResDto.class))),
+            @ApiResponse(responseCode = "500", description = "에러")
+    })
+    @PostMapping
+    public ResponseEntity<SuccessResponse<?>> checkCorrect(@RequestBody QuizCheckReqDto reqDto,
+                                                           @MemberInfo MemberInfoParam memberInfoParam) {
+        QuizCheckResDto result = quizService.checkQuiz(reqDto, memberInfoParam);
         return SuccessResponse.ok(result);
     }
 

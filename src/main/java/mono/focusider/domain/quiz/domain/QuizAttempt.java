@@ -29,4 +29,13 @@ public class QuizAttempt extends BaseTimeEntity {
     @Convert(converter = QuizStatusTypeConverter.class)
     @Builder.Default
     private QuizStatusType quizStatusType = QuizStatusType.QUIZ_INCORRECT;
+
+    public static QuizAttempt of(Quiz quiz, Member member, QuizStatusType quizStatusType) {
+        return QuizAttempt
+                .builder()
+                .quiz(quiz)
+                .member(member)
+                .quizStatusType(quizStatusType)
+                .build();
+    }
 }

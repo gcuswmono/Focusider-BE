@@ -33,4 +33,5 @@ jobs:
           echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
           docker compose stop focusider
           docker compose pull focusider
+          docker compose rm focusider
           docker compose up -d focusider

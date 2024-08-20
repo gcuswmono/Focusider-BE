@@ -11,10 +11,12 @@ import mono.focusider.domain.quiz.dto.info.QuizSetInfo;
 import mono.focusider.domain.quiz.dto.req.QuizCheckReqDto;
 import mono.focusider.domain.quiz.dto.res.QuizCheckResDto;
 import mono.focusider.domain.quiz.dto.res.QuizGetResDto;
+import mono.focusider.domain.quiz.dto.res.QuizWrongResDto;
 import mono.focusider.domain.quiz.service.QuizService;
 import mono.focusider.global.annotation.MemberInfo;
 import mono.focusider.global.aspect.member.MemberInfoParam;
 import mono.focusider.global.domain.SuccessResponse;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,6 +46,17 @@ public class QuizController {
     public ResponseEntity<SuccessResponse<?>> checkCorrect(@RequestBody QuizCheckReqDto reqDto,
                                                            @MemberInfo MemberInfoParam memberInfoParam) {
         QuizCheckResDto result = quizService.checkQuiz(reqDto, memberInfoParam);
+        return SuccessResponse.ok(result);
+    }
+
+    @Operation(summary = "퀴즈 오답 리스트", description = "퀴즈 오답 리스트", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = QuizWrongResDto.class))),
+            @ApiResponse(responseCode = "500", description = "에러")
+    })
+    @GetMapping("/wrong/list")
+    public ResponseEntity<SuccessResponse<?>> getWrongQuizList(@MemberInfo MemberInfoParam memberInfoParam,
+                                                               Pageable pageable) {
+        QuizWrongResDto result = quizService.findWrongQuizList(memberInfoParam, pageable);
         return SuccessResponse.ok(result);
     }
 

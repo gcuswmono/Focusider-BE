@@ -39,6 +39,10 @@ public class Quiz extends BaseTimeEntity {
     @Builder.Default
     private List<QuizAttempt> quizAttempts = new ArrayList<>();
 
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<QuizKeyword> quizKeywords = new ArrayList<>();
+
     public static Quiz of(String title, String content, Integer level, Commentary commentary) {
         return Quiz
                 .builder()

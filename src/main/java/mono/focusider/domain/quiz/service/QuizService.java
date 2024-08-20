@@ -7,14 +7,19 @@ import mono.focusider.domain.quiz.domain.Choice;
 import mono.focusider.domain.quiz.domain.Commentary;
 import mono.focusider.domain.quiz.domain.Keyword;
 import mono.focusider.domain.quiz.domain.Quiz;
+import mono.focusider.domain.quiz.dto.info.QuizInfo;
 import mono.focusider.domain.quiz.dto.info.QuizSetInfo;
 import mono.focusider.domain.quiz.dto.req.QuizCheckReqDto;
 import mono.focusider.domain.quiz.dto.res.QuizCheckResDto;
 import mono.focusider.domain.quiz.dto.res.QuizGetResDto;
+import mono.focusider.domain.quiz.dto.res.QuizWrongResDto;
 import mono.focusider.domain.quiz.helper.*;
 import mono.focusider.domain.quiz.mapper.ChoiceMapper;
+import mono.focusider.domain.quiz.mapper.QuizAttemptMapper;
 import mono.focusider.domain.quiz.type.QuizStatusType;
 import mono.focusider.global.aspect.member.MemberInfoParam;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +37,7 @@ public class QuizService {
     private final ChoiceHelper choiceHelper;
     private final ChoiceMapper choiceMapper;
     private final QuizAttemptHelper quizAttemptHelper;
+    private final QuizAttemptMapper quizAttemptMapper;
 
     public QuizGetResDto findQuizByLevel(MemberInfoParam memberInfoParam) {
         return quizHelper.findQuizInfoByLevelAndMemberId(memberInfoParam.memberLevel(), memberInfoParam.memberId());
@@ -54,6 +60,11 @@ public class QuizService {
         }
         quizAttemptHelper.createAndSaveQuizAttempt(quiz, member, quizStatusType);
         return choiceMapper.toQuizCheckResDto(correctContent, userContent, commentaryContent);
+    }
+
+    public QuizWrongResDto findWrongQuizList(MemberInfoParam memberInfoParam, Pageable pageable) {
+        Page<QuizInfo> wrongQuizInfo = quizAttemptHelper.findWrongQuizInfo(memberInfoParam.memberId(), pageable);
+        return quizAttemptMapper.toQuizWrongResDto(wrongQuizInfo);
     }
 
     @Transactional

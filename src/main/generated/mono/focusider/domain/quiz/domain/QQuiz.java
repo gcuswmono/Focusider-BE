@@ -42,6 +42,8 @@ public class QQuiz extends EntityPathBase<Quiz> {
 
     public final ListPath<QuizAttempt, QQuizAttempt> quizAttempts = this.<QuizAttempt, QQuizAttempt>createList("quizAttempts", QuizAttempt.class, QQuizAttempt.class, PathInits.DIRECT2);
 
+    public final ListPath<QuizKeyword, QQuizKeyword> quizKeywords = this.<QuizKeyword, QQuizKeyword>createList("quizKeywords", QuizKeyword.class, QQuizKeyword.class, PathInits.DIRECT2);
+
     public final StringPath title = createString("title");
 
     public QQuiz(String variable) {

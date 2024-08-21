@@ -1,4 +1,4 @@
-package mono.focusider.domain.quiz.repository;
+package mono.focusider.domain.quiz.repository.quiz;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
@@ -14,7 +14,7 @@ import static mono.focusider.domain.quiz.domain.QQuiz.quiz;
 import static mono.focusider.domain.quiz.domain.QQuizAttempt.quizAttempt;
 
 @RequiredArgsConstructor
-public class QuizQueryRepositoryImpl implements QuizQueryRepository{
+public class QuizGetResDtoQueryRepositoryImpl implements QuizGetResDtoQueryRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
@@ -37,4 +37,23 @@ public class QuizQueryRepositoryImpl implements QuizQueryRepository{
                         )
                 )).values().stream().findFirst().orElse(null);
     }
+
+    @Override
+    public QuizGetResDto findByQuizId(long quizId) {
+        return queryFactory
+                .from(quiz)
+                .leftJoin(quiz.choices, choice)
+                .where(quiz.id.eq(quizId))
+                .transform(groupBy(quiz.id).as(
+                        Projections.constructor(QuizGetResDto.class,
+                                quiz.id,
+                                quiz.title,
+                                quiz.content,
+                                list(Projections.constructor(ChoiceInfo.class,
+                                        choice.id,
+                                        choice.content)
+                                ))
+                )).values().stream().findFirst().orElse(null);
+    }
+
 }

@@ -42,8 +42,10 @@ public class SecurityConfig {
                 .csrf((auth) -> auth.disable())
                 .formLogin((auth) -> auth.disable())
                 .httpBasic((auth) -> auth.disable())
-                .addFilterBefore(new JwtFilter(jwtUtil, authMapper, redisUtils), UsernamePasswordAuthenticationFilter.class)
-                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
+                        authorizationManagerRequestMatcherRegistry.anyRequest().authenticated())
+                .addFilterBefore(new JwtFilter(jwtUtil, authMapper, redisUtils), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

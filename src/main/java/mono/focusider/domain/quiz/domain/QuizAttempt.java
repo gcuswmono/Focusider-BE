@@ -42,4 +42,9 @@ public class QuizAttempt extends BaseTimeEntity {
                 .time(time)
                 .build();
     }
+
+    public void updateQuizStatusAndTime(QuizStatusType quizStatusType, Long time) {
+        this.quizStatusType = quizStatusType;
+        this.time = time;
+    }
 }

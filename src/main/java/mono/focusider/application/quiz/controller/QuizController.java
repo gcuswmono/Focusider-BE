@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.quiz.dto.info.QuizSetInfo;
+import mono.focusider.domain.quiz.dto.req.QuizCheckReReqDto;
 import mono.focusider.domain.quiz.dto.req.QuizCheckReqDto;
 import mono.focusider.domain.quiz.dto.res.QuizCheckResDto;
 import mono.focusider.domain.quiz.dto.res.QuizGetResDto;
@@ -45,7 +46,17 @@ public class QuizController {
     @PostMapping
     public ResponseEntity<SuccessResponse<?>> checkCorrect(@RequestBody QuizCheckReqDto reqDto,
                                                            @MemberInfo MemberInfoParam memberInfoParam) {
-        QuizCheckResDto result = quizService.checkQuiz(reqDto, memberInfoParam);
+        QuizCheckResDto result = quizService.checkAndSaveQuiz(reqDto, memberInfoParam);
+        return SuccessResponse.ok(result);
+    }
+
+    @Operation(summary = "오답 퀴즈 정답 체크", description = "오답 퀴즈 정답 체크", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = QuizCheckResDto.class))),
+            @ApiResponse(responseCode = "500", description = "에러")
+    })
+    @PatchMapping
+    public ResponseEntity<SuccessResponse<?>> checkCorrectRe(@RequestBody QuizCheckReReqDto reqDto) {
+        QuizCheckResDto result = quizService.checkAndUpdateQuiz(reqDto);
         return SuccessResponse.ok(result);
     }
 

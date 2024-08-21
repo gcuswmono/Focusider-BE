@@ -33,9 +33,9 @@ public class AuthService {
     public void signup(SignupRequestDto signupRequestDto) {
         authValidator.checkAccountId(signupRequestDto.accountId());
         String password = passwordEncoder.encode(signupRequestDto.password());
-        File profileImageFile = fileHelper.findFileByUrl(signupRequestDto.profileImage());
+        File profileImageFile = fileHelper.findFileByUrlOrNull(signupRequestDto.profileImage());
         authHelper.createMemberAndSave(signupRequestDto, profileImageFile, password);
-        profileImageFile.updateUsed();
+        fileHelper.checkFileIsPresent(profileImageFile);
     }
 
     public void login(LoginRequestDto loginRequestDto, HttpServletResponse response) {

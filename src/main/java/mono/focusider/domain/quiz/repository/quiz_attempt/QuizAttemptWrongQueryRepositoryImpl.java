@@ -1,4 +1,4 @@
-package mono.focusider.domain.quiz.repository;
+package mono.focusider.domain.quiz.repository.quiz_attempt;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;

@@ -28,9 +28,8 @@ public class MemberController {
             @ApiResponse(responseCode = "500", description = "에러")
     })
     @PostMapping("/add")
-    public ResponseEntity<SuccessResponse<?>> add(@RequestBody MemberCategorySaveReqDto req,
-                                                  @MemberInfo MemberInfoParam memberInfo) {
-        memberService.createMemberCategory(req, memberInfo);
+    public ResponseEntity<SuccessResponse<?>> add(@RequestBody MemberCategorySaveReqDto req) {
+        memberService.createMemberCategory(req);
         return SuccessResponse.ok(null);
     }
 }

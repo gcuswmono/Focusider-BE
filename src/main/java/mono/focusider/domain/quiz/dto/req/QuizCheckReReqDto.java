@@ -1,7 +1,7 @@
 package mono.focusider.domain.quiz.dto.req;
 
-public record QuizCheckReqDto(
-        Long quizId,
+public record QuizCheckReReqDto(
+        Long quizAttemptId,
         Long choiceId,
         Long time
 ) {

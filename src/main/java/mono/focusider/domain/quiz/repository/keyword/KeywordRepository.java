@@ -1,4 +1,4 @@
-package mono.focusider.domain.quiz.repository;
+package mono.focusider.domain.quiz.repository.keyword;
 
 import mono.focusider.domain.quiz.domain.Keyword;
 import org.springframework.data.jpa.repository.JpaRepository;

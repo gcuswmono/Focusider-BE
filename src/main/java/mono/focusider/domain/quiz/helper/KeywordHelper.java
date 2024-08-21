@@ -2,7 +2,7 @@ package mono.focusider.domain.quiz.helper;
 
 import lombok.RequiredArgsConstructor;
 import mono.focusider.domain.quiz.domain.Keyword;
-import mono.focusider.domain.quiz.repository.KeywordRepository;
+import mono.focusider.domain.quiz.repository.keyword.KeywordRepository;
 import mono.focusider.domain.quiz.type.KeywordType;
 import org.springframework.stereotype.Component;
 

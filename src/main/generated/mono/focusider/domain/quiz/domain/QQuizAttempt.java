@@ -38,6 +38,8 @@ public class QQuizAttempt extends EntityPathBase<QuizAttempt> {
 
     public final EnumPath<mono.focusider.domain.quiz.type.QuizStatusType> quizStatusType = createEnum("quizStatusType", mono.focusider.domain.quiz.type.QuizStatusType.class);
 
+    public final NumberPath<Long> time = createNumber("time", Long.class);
+
     public QQuizAttempt(String variable) {
         this(QuizAttempt.class, forVariable(variable), INITS);
     }

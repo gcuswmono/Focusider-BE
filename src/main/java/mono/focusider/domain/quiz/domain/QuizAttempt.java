@@ -30,12 +30,16 @@ public class QuizAttempt extends BaseTimeEntity {
     @Builder.Default
     private QuizStatusType quizStatusType = QuizStatusType.QUIZ_INCORRECT;
 
-    public static QuizAttempt of(Quiz quiz, Member member, QuizStatusType quizStatusType) {
+    @Column(name = "time", nullable = false)
+    private Long time;
+
+    public static QuizAttempt of(Quiz quiz, Member member, QuizStatusType quizStatusType, Long time) {
         return QuizAttempt
                 .builder()
                 .quiz(quiz)
                 .member(member)
                 .quizStatusType(quizStatusType)
+                .time(time)
                 .build();
     }
 }

@@ -44,20 +44,20 @@ public class QuizService {
     @Transactional
     public QuizCheckResDto checkAndSaveQuiz(QuizCheckReqDto quizCheckReqDto, MemberInfoParam memberInfoParam) {
         Member member = memberHelper.findMemberByIdOrThrow(memberInfoParam.memberId());
-        List<Choice> choices = choiceHelper.getChoices(quizCheckReqDto.quizId(), quizCheckReqDto.choiceId());
+        Quiz quiz = quizHelper.findAllDataByQuizId(quizCheckReqDto.quizId(), quizCheckReqDto.choiceId());
+        List<Choice> choices = quiz.getChoices();
         Choice correctChoice = findCorrectChoice(choices);
         Choice userChoice = findUserChoice(choices, quizCheckReqDto.choiceId());
-        Quiz quiz = correctChoice.getQuiz();
         QuizStatusType quizStatusType = checkCorrect(userChoice.getContent(), correctChoice.getContent());
         String commentaryContent = correctChoice.getQuiz().getCommentary().getContent();
-
         quizAttemptHelper.createAndSaveQuizAttempt(quiz, member, quizStatusType, quizCheckReqDto.time());
         return choiceMapper.toQuizCheckResDto(correctChoice.getContent(), userChoice.getContent(), commentaryContent);
     }
 
     @Transactional
     public QuizCheckResDto checkAndUpdateQuiz(QuizCheckReReqDto quizCheckReReqDto) {
-        QuizAttempt quizAttempt = quizAttemptHelper.findQuizAttemptAndQuizById(quizCheckReReqDto.quizAttemptId());
+        QuizAttempt quizAttempt = quizAttemptHelper
+                .findQuizAttemptAndQuizById(quizCheckReReqDto.quizAttemptId(), quizCheckReReqDto.choiceId());
         List<Choice> choices = quizAttempt.getQuiz().getChoices();
         Choice correctChoice = findCorrectChoice(choices);
         Choice userChoice = findUserChoice(choices, quizCheckReReqDto.choiceId());

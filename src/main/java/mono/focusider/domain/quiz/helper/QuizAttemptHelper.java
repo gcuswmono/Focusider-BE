@@ -5,7 +5,7 @@ import mono.focusider.domain.member.domain.Member;
 import mono.focusider.domain.quiz.domain.Quiz;
 import mono.focusider.domain.quiz.domain.QuizAttempt;
 import mono.focusider.domain.quiz.dto.info.QuizInfo;
-import mono.focusider.domain.quiz.repository.QuizAttemptRepository;
+import mono.focusider.domain.quiz.repository.quiz_attempt.QuizAttemptRepository;
 import mono.focusider.domain.quiz.type.QuizStatusType;
 import mono.focusider.global.error.exception.EntityNotFoundException;
 import org.springframework.data.domain.Page;
@@ -27,8 +27,8 @@ public class QuizAttemptHelper {
         quizAttemptRepository.save(QuizAttempt.of(quiz, member, quizStatusType, time));
     }
 
-    public QuizAttempt findQuizAttemptAndQuizById(Long id) {
-        return quizAttemptRepository.findQuizAttemptAndQuizById(id)
+    public QuizAttempt findQuizAttemptAndQuizById(Long id, Long userChoiceId) {
+        return quizAttemptRepository.findQuizAttemptAndQuizByIdAndUserChoiceId(id, userChoiceId)
                 .orElseThrow(() -> new EntityNotFoundException(QUIZ_REPORT_NOT_FOUND));
     }
 }

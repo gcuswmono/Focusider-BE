@@ -60,6 +60,16 @@ public class QuizController {
         return SuccessResponse.ok(result);
     }
 
+    @Operation(summary = "특정 퀴즈 상세", description = "특정 퀴즈 상세", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = QuizWrongResDto.class))),
+            @ApiResponse(responseCode = "500", description = "에러")
+    })
+    @GetMapping("/{quizId}")
+    public ResponseEntity<SuccessResponse<?>> getWrongQuizDetail(@PathVariable Long quizId) {
+        QuizGetResDto result = quizService.findQuizById(quizId);
+        return SuccessResponse.ok(result);
+    }
+
     @PostMapping("/make")
     public ResponseEntity<SuccessResponse<?>> makeQuiz(@RequestBody QuizSetInfo quizSetInfo) {
         quizService.createAndSaveQuiz(quizSetInfo);

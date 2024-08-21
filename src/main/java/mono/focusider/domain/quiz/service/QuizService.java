@@ -58,13 +58,17 @@ public class QuizService {
         if (userChoice.equals(correctChoice)) {
             quizStatusType = QuizStatusType.QUIZ_CORRECT;
         }
-        quizAttemptHelper.createAndSaveQuizAttempt(quiz, member, quizStatusType);
+        quizAttemptHelper.createAndSaveQuizAttempt(quiz, member, quizStatusType, quizCheckReqDto.time());
         return choiceMapper.toQuizCheckResDto(correctContent, userContent, commentaryContent);
     }
 
     public QuizWrongResDto findWrongQuizList(MemberInfoParam memberInfoParam, Pageable pageable) {
         Page<QuizInfo> wrongQuizInfo = quizAttemptHelper.findWrongQuizInfo(memberInfoParam.memberId(), pageable);
         return quizAttemptMapper.toQuizWrongResDto(wrongQuizInfo);
+    }
+
+    public QuizGetResDto findQuizById(Long quizId) {
+        return quizHelper.findQuizInfoById(quizId);
     }
 
     @Transactional

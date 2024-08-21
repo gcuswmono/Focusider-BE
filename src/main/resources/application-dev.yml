@@ -21,7 +21,7 @@ spring:
     redis:
       host: 3.38.179.245
       port: 6379
-      password: focusider!
+      password:
     rest:
       detection-strategy: annotated
 

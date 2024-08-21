@@ -82,7 +82,7 @@ public class InitDb {
     }
 
     private Quiz makeQuiz(Long id, String title, String content, Integer level, Commentary commentary) {
-        Quiz quiz = new Quiz(id, title, content, level, commentary, new ArrayList<>(), new ArrayList<>());
+        Quiz quiz = new Quiz(id, title, content, level, commentary, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
         return quizRepository.save(quiz);
     }
 

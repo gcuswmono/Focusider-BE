@@ -1,4 +1,4 @@
-package mono.focusider.domain.quiz.repository;
+package mono.focusider.domain.quiz.repository.keyword;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

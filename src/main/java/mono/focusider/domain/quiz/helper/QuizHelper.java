@@ -19,4 +19,8 @@ public class QuizHelper {
     public QuizGetResDto findQuizInfoByLevelAndMemberId(int level, Long memberId) {
         return quizRepository.findByLevelAndMemberId(level, memberId);
     }
+
+    public QuizGetResDto findQuizInfoById(Long id) {
+        return quizRepository.findByQuizId(id);
+    }
 }

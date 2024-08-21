@@ -20,7 +20,7 @@ public class QuizAttemptHelper {
         return quizAttemptRepository.getQuizAttemptWrong(pageable, memberId);
     }
 
-    public void createAndSaveQuizAttempt(Quiz quiz, Member member, QuizStatusType quizStatusType) {
-        quizAttemptRepository.save(QuizAttempt.of(quiz, member, quizStatusType));
+    public void createAndSaveQuizAttempt(Quiz quiz, Member member, QuizStatusType quizStatusType, Long time) {
+        quizAttemptRepository.save(QuizAttempt.of(quiz, member, quizStatusType, time));
     }
 }

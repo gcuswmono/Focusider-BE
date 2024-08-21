@@ -3,7 +3,7 @@ package mono.focusider.domain.file.helper;
 import lombok.RequiredArgsConstructor;
 import mono.focusider.domain.file.domain.File;
 import mono.focusider.domain.file.repository.FileRepository;
-import mono.focusider.global.error.exception.EntityNotFoundException;
+import mono.focusider.global.error.exception.InvalidValueException;
 import mono.focusider.global.utils.s3.FileType;
 import mono.focusider.global.utils.s3.S3Utils;
 import org.springframework.stereotype.Component;
@@ -28,8 +28,18 @@ public class FileHelper {
         return fileRepository.save(File.createFile(url, NOT_USED.getIsUsed()));
     }
 
+    public File findFileByUrlOrNull(String url) {
+        return fileRepository.findByUrl(url)
+                .orElse(null);
+    }
+
     public File findFileByUrl(String url) {
         return fileRepository.findByUrl(url)
-                .orElseThrow(() -> new EntityNotFoundException(FILE_NOT_FOUND));
+                .orElseThrow(() -> new InvalidValueException(FILE_NOT_FOUND));
+    }
+
+    public void checkFileIsPresent(File profileImageFile) {
+        if(profileImageFile != null)
+            profileImageFile.updateUsed();
     }
 }

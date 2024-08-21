@@ -3,12 +3,10 @@ package mono.focusider.domain.quiz.service;
 import lombok.RequiredArgsConstructor;
 import mono.focusider.domain.member.domain.Member;
 import mono.focusider.domain.member.helper.MemberHelper;
-import mono.focusider.domain.quiz.domain.Choice;
-import mono.focusider.domain.quiz.domain.Commentary;
-import mono.focusider.domain.quiz.domain.Keyword;
-import mono.focusider.domain.quiz.domain.Quiz;
+import mono.focusider.domain.quiz.domain.*;
 import mono.focusider.domain.quiz.dto.info.QuizInfo;
 import mono.focusider.domain.quiz.dto.info.QuizSetInfo;
+import mono.focusider.domain.quiz.dto.req.QuizCheckReReqDto;
 import mono.focusider.domain.quiz.dto.req.QuizCheckReqDto;
 import mono.focusider.domain.quiz.dto.res.QuizCheckResDto;
 import mono.focusider.domain.quiz.dto.res.QuizGetResDto;
@@ -43,28 +41,39 @@ public class QuizService {
         return quizHelper.findQuizInfoByLevelAndMemberId(memberInfoParam.memberLevel(), memberInfoParam.memberId());
     }
 
-    public QuizCheckResDto checkQuiz(QuizCheckReqDto quizCheckReqDto, MemberInfoParam memberInfoParam) {
+    @Transactional
+    public QuizCheckResDto checkAndSaveQuiz(QuizCheckReqDto quizCheckReqDto, MemberInfoParam memberInfoParam) {
         Member member = memberHelper.findMemberByIdOrThrow(memberInfoParam.memberId());
-        QuizStatusType quizStatusType = QuizStatusType.QUIZ_INCORRECT;
-        List<Choice> choices = choiceHelper.getChoices(quizCheckReqDto.quizId(), quizCheckReqDto.choiceId());
+        Quiz quiz = quizHelper.findAllDataByQuizId(quizCheckReqDto.quizId(), quizCheckReqDto.choiceId());
+        List<Choice> choices = quiz.getChoices();
         Choice correctChoice = findCorrectChoice(choices);
-        Choice userChoice = findUserChoice(choices, quizCheckReqDto);
-        Quiz quiz = correctChoice.getQuiz();
-
-        String userContent = userChoice.getContent();
-        String correctContent = correctChoice.getContent();
+        Choice userChoice = findUserChoice(choices, quizCheckReqDto.choiceId());
+        QuizStatusType quizStatusType = checkCorrect(userChoice.getContent(), correctChoice.getContent());
         String commentaryContent = correctChoice.getQuiz().getCommentary().getContent();
+        quizAttemptHelper.createAndSaveQuizAttempt(quiz, member, quizStatusType, quizCheckReqDto.time());
+        return choiceMapper.toQuizCheckResDto(correctChoice.getContent(), userChoice.getContent(), commentaryContent);
+    }
 
-        if (userChoice.equals(correctChoice)) {
-            quizStatusType = QuizStatusType.QUIZ_CORRECT;
-        }
-        quizAttemptHelper.createAndSaveQuizAttempt(quiz, member, quizStatusType);
-        return choiceMapper.toQuizCheckResDto(correctContent, userContent, commentaryContent);
+    @Transactional
+    public QuizCheckResDto checkAndUpdateQuiz(QuizCheckReReqDto quizCheckReReqDto) {
+        QuizAttempt quizAttempt = quizAttemptHelper
+                .findQuizAttemptAndQuizById(quizCheckReReqDto.quizAttemptId(), quizCheckReReqDto.choiceId());
+        List<Choice> choices = quizAttempt.getQuiz().getChoices();
+        Choice correctChoice = findCorrectChoice(choices);
+        Choice userChoice = findUserChoice(choices, quizCheckReReqDto.choiceId());
+        String commentaryContent = quizAttempt.getQuiz().getCommentary().getContent();
+        QuizStatusType quizStatusType = checkCorrect(userChoice.getContent(), correctChoice.getContent());
+        quizAttempt.updateQuizStatusAndTime(quizStatusType, quizCheckReReqDto.time());
+        return choiceMapper.toQuizCheckResDto(correctChoice.getContent(), userChoice.getContent(), commentaryContent);
     }
 
     public QuizWrongResDto findWrongQuizList(MemberInfoParam memberInfoParam, Pageable pageable) {
         Page<QuizInfo> wrongQuizInfo = quizAttemptHelper.findWrongQuizInfo(memberInfoParam.memberId(), pageable);
         return quizAttemptMapper.toQuizWrongResDto(wrongQuizInfo);
+    }
+
+    public QuizGetResDto findQuizById(Long quizId) {
+        return quizHelper.findQuizInfoById(quizId);
     }
 
     @Transactional
@@ -80,6 +89,10 @@ public class QuizService {
         });
     }
 
+    private QuizStatusType checkCorrect(String userChoiceContent, String answerChoiceContent) {
+        return userChoiceContent.equals(answerChoiceContent) ? QuizStatusType.QUIZ_CORRECT : QuizStatusType.QUIZ_INCORRECT;
+    }
+
     private Choice findCorrectChoice(List<Choice> choices) {
         return choices.stream()
                 .filter(Choice::getIsAnswer)
@@ -87,9 +100,9 @@ public class QuizService {
                 .orElseThrow(() -> new IllegalStateException("Correct choice not found"));
     }
 
-    private Choice findUserChoice(List<Choice> choices, QuizCheckReqDto quizCheckReqDto) {
+    private Choice findUserChoice(List<Choice> choices, Long choiceId) {
         return choices.stream()
-                .filter(choice -> choice.getId().equals(quizCheckReqDto.choiceId()))
+                .filter(choice -> choice.getId().equals(choiceId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("User's choice not found"));
     }

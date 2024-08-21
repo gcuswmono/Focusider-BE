@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.quiz.dto.info.QuizSetInfo;
+import mono.focusider.domain.quiz.dto.req.QuizCheckReReqDto;
 import mono.focusider.domain.quiz.dto.req.QuizCheckReqDto;
 import mono.focusider.domain.quiz.dto.res.QuizCheckResDto;
 import mono.focusider.domain.quiz.dto.res.QuizGetResDto;
@@ -45,7 +46,17 @@ public class QuizController {
     @PostMapping
     public ResponseEntity<SuccessResponse<?>> checkCorrect(@RequestBody QuizCheckReqDto reqDto,
                                                            @MemberInfo MemberInfoParam memberInfoParam) {
-        QuizCheckResDto result = quizService.checkQuiz(reqDto, memberInfoParam);
+        QuizCheckResDto result = quizService.checkAndSaveQuiz(reqDto, memberInfoParam);
+        return SuccessResponse.ok(result);
+    }
+
+    @Operation(summary = "오답 퀴즈 정답 체크", description = "오답 퀴즈 정답 체크", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = QuizCheckResDto.class))),
+            @ApiResponse(responseCode = "500", description = "에러")
+    })
+    @PatchMapping
+    public ResponseEntity<SuccessResponse<?>> checkCorrectRe(@RequestBody QuizCheckReReqDto reqDto) {
+        QuizCheckResDto result = quizService.checkAndUpdateQuiz(reqDto);
         return SuccessResponse.ok(result);
     }
 
@@ -57,6 +68,16 @@ public class QuizController {
     public ResponseEntity<SuccessResponse<?>> getWrongQuizList(@MemberInfo MemberInfoParam memberInfoParam,
                                                                Pageable pageable) {
         QuizWrongResDto result = quizService.findWrongQuizList(memberInfoParam, pageable);
+        return SuccessResponse.ok(result);
+    }
+
+    @Operation(summary = "특정 퀴즈 상세", description = "특정 퀴즈 상세", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = QuizWrongResDto.class))),
+            @ApiResponse(responseCode = "500", description = "에러")
+    })
+    @GetMapping("/{quizId}")
+    public ResponseEntity<SuccessResponse<?>> getWrongQuizDetail(@PathVariable Long quizId) {
+        QuizGetResDto result = quizService.findQuizById(quizId);
         return SuccessResponse.ok(result);
     }
 

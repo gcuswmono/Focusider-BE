@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthMapper {
 
-    public AuthUserInfo toAuthUserInfoWithToken(Long memberId, String name, MemberGenderType gender, Integer level, MemberRole memberRole) {
-        return AuthUserInfo.ofToken(memberId, name, gender, level, memberRole);
+    public AuthUserInfo toAuthUserInfoWithToken(Long memberId, String name, Integer level, MemberRole memberRole) {
+        return AuthUserInfo.ofToken(memberId, name, level, memberRole);
     }
 
     public AuthUserInfo toAuthUserInfoWithMember(Member member) {

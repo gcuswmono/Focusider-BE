@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Past;
 
 import java.time.LocalDate;
 
-public record SignupRequestDto(
+public record SignupReqDto(
         @NotBlank(message = "Username is required")
         String accountId,
         @NotBlank(message = "Password is required")

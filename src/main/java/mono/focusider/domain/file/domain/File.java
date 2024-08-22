@@ -2,13 +2,14 @@ package mono.focusider.domain.file.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import mono.focusider.global.domain.BaseTimeEntity;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
-public class File {
+public class File extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "file_id")
     private Long id;

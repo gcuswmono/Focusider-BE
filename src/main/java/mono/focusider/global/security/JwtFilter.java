@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.auth.dto.info.AuthUserInfo;
 import mono.focusider.domain.auth.mapper.AuthMapper;
-import mono.focusider.domain.member.type.MemberGenderType;
 import mono.focusider.domain.member.type.MemberRole;
 import mono.focusider.global.error.code.GlobalErrorCode;
 import mono.focusider.global.error.exception.ForbiddenException;
@@ -73,10 +72,9 @@ public class JwtFilter extends OncePerRequestFilter {
     private AuthUserInfo createAuthUserInfoDtoForToken(String token) {
         Long memberId = jwtUtil.getMemberId(token);
         String name = jwtUtil.getMemberName(token);
-        String gender = jwtUtil.getMemberGender(token);
         Integer level = jwtUtil.getMemberLevel(token);
         MemberRole memberRole = MemberRole.valueOf(jwtUtil.getMemberRole(token));
-        return authMapper.toAuthUserInfoWithToken(memberId, name, MemberGenderType.valueOf(gender), level, memberRole);
+        return authMapper.toAuthUserInfoWithToken(memberId, name, level, memberRole);
     }
 
     private String refreshAccessToken(String refreshToken, AuthUserInfo authUserInfo, HttpServletResponse response) {

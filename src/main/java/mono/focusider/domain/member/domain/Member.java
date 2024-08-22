@@ -8,6 +8,7 @@ import mono.focusider.domain.category.domain.MemberCategory;
 import mono.focusider.domain.file.domain.File;
 import mono.focusider.domain.member.type.MemberGenderType;
 import mono.focusider.domain.member.type.MemberRole;
+import mono.focusider.domain.member.type.converter.MemberGenderTypeConverter;
 import mono.focusider.domain.member.type.converter.MemberRoleConverter;
 import mono.focusider.global.domain.BaseTimeEntity;
 
@@ -31,7 +32,7 @@ public class Member extends BaseTimeEntity {
     @Column(name = "name", nullable = false)
     private String name;
     @Column(name = "geneder", nullable = false)
-    @Convert(converter = MemberRoleConverter.class)
+    @Convert(converter = MemberGenderTypeConverter.class)
     private MemberGenderType gender;
     @Column(name = "birthday", nullable = false)
     private LocalDate birthDate;

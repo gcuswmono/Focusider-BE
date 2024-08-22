@@ -10,7 +10,7 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry corsRegistry) {
         corsRegistry.addMapping("/**")
                 .allowCredentials(true)
-                .allowedOrigins("http://localhost:3000", "http://localhost:3001", "3.38.179.245:3000", "focusider.shop", "localhost.focusider")
+                .allowedOrigins("http://localhost:3000", "http://localhost:3001", "http://3.38.179.245:3000", "http://focusider.shop", "http://localhost.focusider")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH");
     }
 }

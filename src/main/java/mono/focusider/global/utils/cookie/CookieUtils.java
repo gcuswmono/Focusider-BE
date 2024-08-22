@@ -30,6 +30,28 @@ public class CookieUtils {
         return null;
     }
 
+    public static String getCookieValueWithNameAndKill(HttpServletRequest request, HttpServletResponse response, String name) {
+        Cookie[] cookies = getCookies(request);
+        try{
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(name)) {
+                    String cookieValue = cookie.getValue();
+                    killCookie(cookie, response);
+                    return cookieValue;
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    public static void killCookie(Cookie cookie, HttpServletResponse response) {
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+    }
+
     public static void addCookie(HttpServletResponse response, Cookie cookie) {
         cookie.setPath("/");
         cookie.setHttpOnly(true);

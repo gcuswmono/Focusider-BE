@@ -3,7 +3,7 @@ package mono.focusider.domain.member.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import mono.focusider.domain.attendance.domain.Attendance;
-import mono.focusider.domain.auth.dto.req.SignupRequestDto;
+import mono.focusider.domain.auth.dto.req.SignupReqDto;
 import mono.focusider.domain.category.domain.MemberCategory;
 import mono.focusider.domain.file.domain.File;
 import mono.focusider.domain.member.type.MemberRole;
@@ -52,14 +52,14 @@ public class Member extends BaseTimeEntity {
     @Builder.Default
     private List<Attendance> attendances = new ArrayList<>();
 
-    public static Member createMember(SignupRequestDto signupRequestDto, File profileImageFile, String password) {
+    public static Member createMember(SignupReqDto signupReqDto, File profileImageFile, String password) {
         return Member
                 .builder()
-                .accountId(signupRequestDto.accountId())
+                .accountId(signupReqDto.accountId())
                 .password(password)
-                .name(signupRequestDto.name())
-                .gender(signupRequestDto.gender())
-                .birthDate(signupRequestDto.birthday())
+                .name(signupReqDto.name())
+                .gender(signupReqDto.gender())
+                .birthDate(signupReqDto.birthday())
                 .profileImageFile(profileImageFile)
                 .level(0)
                 .memberRole(MemberRole.ROLE_MEMBER)

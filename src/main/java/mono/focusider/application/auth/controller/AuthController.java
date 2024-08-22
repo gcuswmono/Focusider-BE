@@ -7,8 +7,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mono.focusider.domain.auth.dto.req.LoginRequestDto;
-import mono.focusider.domain.auth.dto.req.SignupRequestDto;
+import mono.focusider.domain.auth.dto.req.CheckDuplicatedReqDto;
+import mono.focusider.domain.auth.dto.req.LoginReqDto;
+import mono.focusider.domain.auth.dto.req.SignupReqDto;
+import mono.focusider.domain.auth.dto.res.CheckDuplicatedResDto;
 import mono.focusider.domain.auth.service.AuthService;
 import mono.focusider.global.domain.SuccessResponse;
 import org.springframework.http.MediaType;
@@ -26,24 +28,34 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
         private final AuthService authService;
 
-        @Operation(summary = "Sign up a new user", description = "Register a new user with username and password", responses = {
+        @Operation(summary = "회원가입", description = "아이디 비밀번호 기반 회원가입", responses = {
                         @ApiResponse(responseCode = "200", description = "User registered successfully"),
                         @ApiResponse(responseCode = "400", description = "Bad request - Invalid input")
         })
         @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-        public ResponseEntity<SuccessResponse<?>> signup(@Valid @RequestBody SignupRequestDto requestDto) {
+        public ResponseEntity<SuccessResponse<?>> signup(@Valid @RequestBody SignupReqDto requestDto) {
                 authService.signup(requestDto);
                 return SuccessResponse.ok(null);
         }
 
-        @Operation(summary = "Login a user", description = "Authenticate a user and return access and refresh tokens as cookies", responses = {
+        @Operation(summary = "로그인", description = "아아디 비밀번호 기반 로그인, accessToken은 쿠키로, refreshToken은 redis", responses = {
                         @ApiResponse(responseCode = "200", description = "Login successful"),
                         @ApiResponse(responseCode = "401", description = "Unauthorized - Invalid credentials")
         })
         @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
-        public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequest, HttpServletResponse response) {
+        public ResponseEntity<?> login(@RequestBody LoginReqDto loginRequest, HttpServletResponse response) {
                 authService.login(loginRequest, response);
                 return SuccessResponse.ok(null);
+        }
+
+        @Operation(summary = "아이디 중복 체크", description = "아이디 중복 체크", responses = {
+                @ApiResponse(responseCode = "200", description = "중복 여부"),
+                @ApiResponse(responseCode = "500", description = "서버 에러")
+        })
+        @PostMapping("/duplicated")
+        public ResponseEntity<SuccessResponse<?>> checkDuplicatedAccountId(@RequestBody CheckDuplicatedReqDto reqDto) {
+                CheckDuplicatedResDto result = authService.checkDuplicated(reqDto);
+                return SuccessResponse.ok(result);
         }
 
 //        @Operation(summary = "Refresh access token", description = "Use a refresh token to obtain a new access token", responses = {

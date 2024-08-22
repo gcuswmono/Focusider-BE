@@ -7,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.member.dto.req.MemberCategorySaveReqDto;
 import mono.focusider.domain.member.service.MemberService;
-import mono.focusider.global.annotation.MemberInfo;
-import mono.focusider.global.aspect.member.MemberInfoParam;
 import mono.focusider.global.domain.SuccessResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

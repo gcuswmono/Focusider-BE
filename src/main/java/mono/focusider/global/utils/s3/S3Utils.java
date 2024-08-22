@@ -2,9 +2,11 @@ package mono.focusider.global.utils.s3;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import mono.focusider.domain.file.dto.info.FileUrlInfo;
 import mono.focusider.global.error.exception.InvalidFileUploadException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,8 +16,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
 import java.util.UUID;
 
+import static com.amazonaws.services.s3.model.DeleteObjectsRequest.KeyVersion;
 import static mono.focusider.global.error.code.GlobalErrorCode.*;
 
 @Slf4j
@@ -47,6 +51,19 @@ public class S3Utils {
         }
     }
 
+    public void deleteFiles(List<FileUrlInfo> fileUrls) {
+        List<KeyVersion> keysToDelete = fileUrls.stream()
+                .map(FileUrlInfo::url)
+                .map(this::getFileNameFromResourceUrl)
+                .map(KeyVersion::new)
+                .toList();
+        for (KeyVersion keyVersion : keysToDelete) {
+            System.out.println(keyVersion.getKey());
+        }
+        DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(bucketName).withKeys(keysToDelete);
+        amazonS3Client.deleteObjects(deleteObjectsRequest);
+    }
+
     private void uploadFileToS3(MultipartFile multipartFile, String savedFileName, ObjectMetadata metadata) {
         try (InputStream inputStream = multipartFile.getInputStream()) {
             amazonS3Client.putObject(bucketName, savedFileName, inputStream, metadata);
@@ -70,6 +87,8 @@ public class S3Utils {
     }
 
     private String getFileNameFromResourceUrl(String fileUrl) {
+        System.out.println(defaultUrl + "/");
+        System.out.println(fileUrl + " " + fileUrl.replace(defaultUrl + "/", ""));
         return fileUrl.replace(defaultUrl + "/", "");
     }
 

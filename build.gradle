@@ -93,6 +93,7 @@ dependencies {
     // shedlock
     implementation 'net.javacrumbs.shedlock:shedlock-spring:4.29.0'
     implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.29.0'
+    implementation 'net.javacrumbs.shedlock:shedlock-core:4.37.0'
 }
 
 tasks.named('test') {

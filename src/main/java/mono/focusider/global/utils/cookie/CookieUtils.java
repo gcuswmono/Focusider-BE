@@ -40,6 +40,8 @@ public class CookieUtils {
         cookie.setPath("/");
         cookie.setHttpOnly(true);
         cookie.setMaxAge(maxAge);
+        cookie.setAttribute("SameSite", "None");
+        cookie.setSecure(false);
         response.addCookie(cookie);
     }
 }

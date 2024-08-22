@@ -1,6 +1,6 @@
 package mono.focusider.domain.auth.dto.req;
 
-public record CheckDuplicatedRequestDto(
+public record CheckDuplicatedReqDto(
         String accountId
 ) {
 }

@@ -76,4 +76,9 @@ public class Member extends BaseTimeEntity {
     public void updateMemberLevel(Integer level) {
         this.level = level;
     }
+
+    public void updateMemberInfo(File profileImageFile, String name) {
+        this.profileImageFile = profileImageFile;
+        this.name = name;
+    }
 }

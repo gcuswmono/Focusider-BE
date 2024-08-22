@@ -7,9 +7,11 @@ import mono.focusider.domain.category.helper.CategoryHelper;
 import mono.focusider.domain.category.mapper.MemberCategoryMapper;
 import mono.focusider.domain.member.domain.Member;
 import mono.focusider.domain.member.dto.req.MemberCategorySaveReqDto;
+import mono.focusider.domain.member.dto.req.MemberInfoReqDto;
 import mono.focusider.domain.member.helper.MemberHelper;
 import mono.focusider.domain.member.type.ReadingHardType;
 import mono.focusider.domain.member.type.ReadingTermType;
+import mono.focusider.global.aspect.member.MemberInfoParam;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,10 @@ public class MemberService {
             member.addMemberCategory(memberCategoryMapper.toMemberCategory(member, category));
         });
         member.updateMemberLevel(level);
+    }
+
+    public MemberInfoReqDto findMemberInfo(MemberInfoParam memberInfoParam) {
+        return memberHelper.findMemberInfoByIdOrThrow(memberInfoParam.memberId());
     }
 
     private Integer settingLevel(MemberCategorySaveReqDto memberCategorySaveReqDto) {

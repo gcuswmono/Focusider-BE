@@ -42,16 +42,16 @@ spring:
 cloud:
   aws:
     s3:
-      bucket: mongdol-s3
-      upload-path: https://mongdol-s3.s3.ap-northeast-2.amazonaws.com
+      bucket: focusider
+      upload-path: https://focusider.s3.ap-northeast-2.amazonaws.com
     region:
       static: ap-northeast-2
       auto: false
     stack:
       auto: false
     credentials:
-      access-key: AKIAS64YBSCO3KNW5IMX
-      secret-key: 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
+      access-key: AKIA6GBMDCUSRF7LIVER
+      secret-key: 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
 
 logging.level:
   org.hibernate.SQL: DEBUG

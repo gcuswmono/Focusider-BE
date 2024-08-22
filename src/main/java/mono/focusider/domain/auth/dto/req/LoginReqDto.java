@@ -1,9 +1,8 @@
 package mono.focusider.domain.auth.dto.req;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 
-public record LoginRequestDto(
+public record LoginReqDto(
         @NotBlank(message = "Username is required")
         String accountId,
         @NotBlank(message = "Password is required")

@@ -23,6 +23,10 @@ public class AuthValidator {
         }
     }
 
+    public boolean checkAccountIdWithBoolean(String accountId) {
+        return memberRepository.existsByAccountId(accountId);
+    }
+
     public void validatePassword(String password, String memberPassword, PasswordEncoder passwordEncoder) {
         try {
             passwordEncoder.matches(password, memberPassword);

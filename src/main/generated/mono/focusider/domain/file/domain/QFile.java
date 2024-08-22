@@ -19,9 +19,17 @@ public class QFile extends EntityPathBase<File> {
 
     public static final QFile file = new QFile("file");
 
+    public final mono.focusider.global.domain.QBaseTimeEntity _super = new mono.focusider.global.domain.QBaseTimeEntity(this);
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final BooleanPath isUsed = createBoolean("isUsed");
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> lastModifiedAt = _super.lastModifiedAt;
 
     public final StringPath url = createString("url");
 

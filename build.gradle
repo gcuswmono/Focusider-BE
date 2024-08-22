@@ -84,6 +84,15 @@ dependencies {
 
     // aws
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.1.RELEASE'
+
+    //batch
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation 'org.springframework.boot:spring-boot-starter-quartz'
+    testImplementation 'org.springframework.batch:spring-batch-test'
+
+    // shedlock
+    implementation 'net.javacrumbs.shedlock:shedlock-spring:4.29.0'
+    implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.29.0'
 }
 
 tasks.named('test') {

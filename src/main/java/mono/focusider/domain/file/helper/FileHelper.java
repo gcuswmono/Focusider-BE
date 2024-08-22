@@ -2,14 +2,15 @@ package mono.focusider.domain.file.helper;
 
 import lombok.RequiredArgsConstructor;
 import mono.focusider.domain.file.domain.File;
+import mono.focusider.domain.file.dto.info.FileUrlInfo;
 import mono.focusider.domain.file.repository.FileRepository;
-import mono.focusider.global.error.exception.InvalidValueException;
 import mono.focusider.global.utils.s3.FileType;
 import mono.focusider.global.utils.s3.S3Utils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import static mono.focusider.domain.file.error.FileErrorCode.FILE_NOT_FOUND;
+import java.util.List;
+
 import static mono.focusider.domain.file.type.FileStatus.NOT_USED;
 
 @Component
@@ -23,6 +24,14 @@ public class FileHelper {
         s3Utils.deleteFile(url);
     }
 
+    public void deleteS3Files(List<FileUrlInfo> urls) {
+        s3Utils.deleteFiles(urls);
+    }
+
+    public void deleteFilesInDb() {
+        fileRepository.deleteFilesByIsUsedFalse();
+    }
+
     public File uploadFile(MultipartFile file) {
         String url = s3Utils.uploadFile(FileType.MEMBER_PROFILE_IMAGE, file);
         return fileRepository.save(File.createFile(url, NOT_USED.getIsUsed()));
@@ -33,9 +42,8 @@ public class FileHelper {
                 .orElse(null);
     }
 
-    public File findFileByUrl(String url) {
-        return fileRepository.findByUrl(url)
-                .orElseThrow(() -> new InvalidValueException(FILE_NOT_FOUND));
+    public List<FileUrlInfo> findFilesByIsUsed() {
+        return fileRepository.findFilesByIsUsedFalse();
     }
 
     public void checkFileIsPresent(File profileImageFile) {

@@ -45,9 +45,4 @@ public class FileHelper {
     public List<FileUrlInfo> findFilesByIsUsed() {
         return fileRepository.findFilesByIsUsedFalse();
     }
-
-    public void checkFileIsPresent(File profileImageFile) {
-        if(profileImageFile != null)
-            profileImageFile.updateUsed();
-    }
 }

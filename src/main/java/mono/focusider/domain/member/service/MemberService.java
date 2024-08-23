@@ -11,6 +11,7 @@ import mono.focusider.domain.file.validate.FileValidate;
 import mono.focusider.domain.member.domain.Member;
 import mono.focusider.domain.member.dto.req.MemberCategorySaveReqDto;
 import mono.focusider.domain.member.dto.req.MemberUpdateReqDto;
+import mono.focusider.domain.member.dto.req.MemberInfoReqDto;
 import mono.focusider.domain.member.helper.MemberHelper;
 import mono.focusider.domain.member.type.ReadingHardType;
 import mono.focusider.domain.member.type.ReadingTermType;
@@ -41,6 +42,10 @@ public class MemberService {
             member.addMemberCategory(memberCategoryMapper.toMemberCategory(member, category));
         });
         member.updateMemberLevel(level);
+    }
+
+    public MemberInfoReqDto findMemberInfo(MemberInfoParam memberInfoParam) {
+        return memberHelper.findMemberInfoByIdOrThrow(memberInfoParam.memberId());
     }
 
     @Transactional

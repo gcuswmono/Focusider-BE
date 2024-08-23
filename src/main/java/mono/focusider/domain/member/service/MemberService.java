@@ -5,11 +5,17 @@ import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.category.domain.Category;
 import mono.focusider.domain.category.helper.CategoryHelper;
 import mono.focusider.domain.category.mapper.MemberCategoryMapper;
+import mono.focusider.domain.file.domain.File;
+import mono.focusider.domain.file.helper.FileHelper;
+import mono.focusider.domain.file.validate.FileValidate;
 import mono.focusider.domain.member.domain.Member;
 import mono.focusider.domain.member.dto.req.MemberCategorySaveReqDto;
+import mono.focusider.domain.member.dto.req.MemberUpdateReqDto;
+import mono.focusider.domain.member.dto.req.MemberInfoReqDto;
 import mono.focusider.domain.member.helper.MemberHelper;
 import mono.focusider.domain.member.type.ReadingHardType;
 import mono.focusider.domain.member.type.ReadingTermType;
+import mono.focusider.global.aspect.member.MemberInfoParam;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +30,8 @@ public class MemberService {
     private final MemberHelper memberHelper;
     private final CategoryHelper categoryHelper;
     private final MemberCategoryMapper memberCategoryMapper;
+    private final FileHelper fileHelper;
+    private final FileValidate fileValidate;
 
     @Transactional
     public void createMemberCategory(MemberCategorySaveReqDto memberCategorySaveReqDto) {
@@ -34,6 +42,19 @@ public class MemberService {
             member.addMemberCategory(memberCategoryMapper.toMemberCategory(member, category));
         });
         member.updateMemberLevel(level);
+    }
+
+    public MemberInfoReqDto findMemberInfo(MemberInfoParam memberInfoParam) {
+        return memberHelper.findMemberInfoByIdOrThrow(memberInfoParam.memberId());
+    }
+
+    @Transactional
+    public void updateMemberInfo(MemberUpdateReqDto memberUpdateReqDto, MemberInfoParam memberInfoParam) {
+        Member member = memberHelper.findMemberByIdWithFileOrThrow(memberInfoParam.memberId());
+        File file = fileHelper.findFileByUrlOrNull(memberUpdateReqDto.profileImageUrl());
+        fileValidate.validateFileAndUpdateUnUsed(member.getProfileImageFile());
+        member.updateMemberInfo(file, memberUpdateReqDto.name());
+        fileValidate.validateFileAndUpdateUsed(file);
     }
 
     private Integer settingLevel(MemberCategorySaveReqDto memberCategorySaveReqDto) {

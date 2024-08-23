@@ -1,5 +1,6 @@
 package mono.focusider.domain.auth.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +18,13 @@ import mono.focusider.domain.file.validate.FileValidate;
 import mono.focusider.domain.member.domain.Member;
 import mono.focusider.domain.member.helper.MemberHelper;
 import mono.focusider.global.security.JwtUtil;
+import mono.focusider.global.utils.cookie.CookieUtils;
+import mono.focusider.global.utils.redis.RedisUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static mono.focusider.global.utils.cookie.CookieEnum.ACCESS_TOKEN;
 
 @Slf4j
 @Service
@@ -34,6 +39,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final AuthHelper authHelper;
     private final AuthMapper authMapper;
+    private final RedisUtils redisUtils;
 
     @Transactional
     public void signup(SignupReqDto signupReqDto) {
@@ -57,5 +63,10 @@ public class AuthService {
     public CheckDuplicatedResDto checkDuplicated(CheckDuplicatedReqDto checkDuplicatedReqDto) {
         boolean check = authValidator.checkAccountIdWithBoolean(checkDuplicatedReqDto.accountId());
         return authMapper.toCheckDuplicatedResDto(check);
+    }
+
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        String accessToken = CookieUtils.getCookieValueWithNameAndKill(request, response, ACCESS_TOKEN.getName());
+        redisUtils.deleteData(accessToken);
     }
 }

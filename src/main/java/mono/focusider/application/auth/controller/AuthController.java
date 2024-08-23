@@ -3,6 +3,7 @@ package mono.focusider.application.auth.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +16,7 @@ import mono.focusider.domain.auth.service.AuthService;
 import mono.focusider.global.domain.SuccessResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -56,6 +54,16 @@ public class AuthController {
         public ResponseEntity<SuccessResponse<?>> checkDuplicatedAccountId(@RequestBody CheckDuplicatedReqDto reqDto) {
                 CheckDuplicatedResDto result = authService.checkDuplicated(reqDto);
                 return SuccessResponse.ok(result);
+        }
+
+        @Operation(summary = "로그 아웃", description = "로그 아웃", responses = {
+                @ApiResponse(responseCode = "200", description = "로그 아웃"),
+                @ApiResponse(responseCode = "500", description = "에러")
+        })
+        @GetMapping("/logout")
+        public ResponseEntity<SuccessResponse<?>> logout(HttpServletRequest request, HttpServletResponse response) {
+                authService.logout(request, response);
+                return SuccessResponse.ok(null);
         }
 
 //        @Operation(summary = "Refresh access token", description = "Use a refresh token to obtain a new access token", responses = {

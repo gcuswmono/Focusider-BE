@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.auth.dto.info.AuthUserInfo;
 import mono.focusider.domain.auth.mapper.AuthMapper;
+import mono.focusider.domain.member.type.MemberGenderType;
 import mono.focusider.domain.member.type.MemberRole;
 import mono.focusider.global.error.code.GlobalErrorCode;
 import mono.focusider.global.error.exception.ForbiddenException;

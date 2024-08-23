@@ -13,6 +13,7 @@ import mono.focusider.domain.auth.mapper.AuthMapper;
 import mono.focusider.domain.auth.validator.AuthValidator;
 import mono.focusider.domain.file.domain.File;
 import mono.focusider.domain.file.helper.FileHelper;
+import mono.focusider.domain.file.validate.FileValidate;
 import mono.focusider.domain.member.domain.Member;
 import mono.focusider.domain.member.helper.MemberHelper;
 import mono.focusider.global.security.JwtUtil;
@@ -29,6 +30,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final MemberHelper memberHelper;
     private final FileHelper fileHelper;
+    private final FileValidate fileValidate;
     private final JwtUtil jwtUtil;
     private final AuthHelper authHelper;
     private final AuthMapper authMapper;
@@ -39,7 +41,7 @@ public class AuthService {
         String password = passwordEncoder.encode(signupReqDto.password());
         File profileImageFile = fileHelper.findFileByUrlOrNull(signupReqDto.profileImage());
         authHelper.createMemberAndSave(signupReqDto, profileImageFile, password);
-        fileHelper.checkFileIsPresent(profileImageFile);
+        fileValidate.validateFileAndUpdateUsed(profileImageFile);
     }
 
     public void login(LoginReqDto loginReqDto, HttpServletResponse response) {

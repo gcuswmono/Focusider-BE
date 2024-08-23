@@ -29,4 +29,9 @@ public class MemberHelper {
         return memberRepository.findMemberInfoById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
+
+    public Member findMemberByIdWithFileOrThrow(Long id) {
+        return memberRepository.findByIdWithFile(id)
+                .orElseThrow(() -> new EntityNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+    }
 }

@@ -2,6 +2,8 @@ package mono.focusider.domain.member.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import mono.focusider.domain.article.dto.info.ReadingStatInfo;
+import mono.focusider.domain.article.helper.ReadingHelper;
 import mono.focusider.domain.category.domain.Category;
 import mono.focusider.domain.category.helper.CategoryHelper;
 import mono.focusider.domain.category.mapper.MemberCategoryMapper;
@@ -11,10 +13,14 @@ import mono.focusider.domain.file.validate.FileValidate;
 import mono.focusider.domain.member.domain.Member;
 import mono.focusider.domain.member.dto.req.MemberCategorySaveReqDto;
 import mono.focusider.domain.member.dto.req.MemberInfoReqDto;
+import mono.focusider.domain.member.dto.req.MemberStatReqDto;
 import mono.focusider.domain.member.dto.req.MemberUpdateReqDto;
+import mono.focusider.domain.member.dto.res.MemberStatResDto;
 import mono.focusider.domain.member.helper.MemberHelper;
+import mono.focusider.domain.member.mapper.MemberMapper;
 import mono.focusider.domain.member.type.ReadingHardType;
 import mono.focusider.domain.member.type.ReadingTermType;
+import mono.focusider.domain.quiz.helper.QuizAttemptHelper;
 import mono.focusider.global.aspect.member.MemberInfoParam;
 import mono.focusider.global.utils.redis.RedisUtils;
 import org.springframework.stereotype.Service;
@@ -36,6 +42,9 @@ public class MemberService {
     private final FileHelper fileHelper;
     private final FileValidate fileValidate;
     private final RedisUtils redisUtils;
+    private final QuizAttemptHelper quizAttemptHelper;
+    private final ReadingHelper readingHelper;
+    private final MemberMapper memberMapper;
 
     @Transactional
     public void createMemberCategory(MemberCategorySaveReqDto memberCategorySaveReqDto) {
@@ -66,6 +75,12 @@ public class MemberService {
         Member member = memberHelper.findMemberByIdOrThrow(memberInfoParam.memberId());
         member.deleteMemberSoft();
         redisUtils.setDataWithExpireTime(ofMemberHardDeleted(member.getId()));
+    }
+
+    public MemberStatResDto findMemberMonthlyStat(MemberInfoParam memberInfoParam, MemberStatReqDto memberStatReqDto) {
+        Long totalSolveTime = quizAttemptHelper.sumQuizSolveTime(memberInfoParam.memberId(), memberStatReqDto.statDate());
+        ReadingStatInfo readingStatInfo = readingHelper.sumReadingTime(memberInfoParam.memberId(), memberStatReqDto.statDate());
+        return memberMapper.toMemberStatResDto(totalSolveTime, readingStatInfo);
     }
 
     private Integer settingLevel(MemberCategorySaveReqDto memberCategorySaveReqDto) {

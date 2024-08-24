@@ -5,6 +5,7 @@ import mono.focusider.domain.article.dto.res.ArticleDetailResDto;
 import mono.focusider.domain.article.helper.ArticleHelper;
 import mono.focusider.domain.category.domain.Category;
 import mono.focusider.domain.category.domain.MemberCategory;
+import mono.focusider.domain.category.type.CategoryType;
 import mono.focusider.domain.member.domain.Member;
 import mono.focusider.domain.member.helper.MemberHelper;
 import mono.focusider.global.aspect.member.MemberInfoParam;
@@ -22,10 +23,10 @@ public class ArticleService {
 
     public ArticleDetailResDto findArticleDetail(MemberInfoParam memberInfoParam) {
         Member member = memberHelper.findMemberByIdWithCategoriesOrThrow(memberInfoParam.memberId());
-        List<Long> memberCategoryIds = member.getMemberCategories().stream()
+        List<CategoryType> memberCategoryTypes = member.getMemberCategories().stream()
                 .map(MemberCategory::getCategory)
-                .map(Category::getId)
+                .map(Category::getCategoryType)
                 .toList();
-        return articleHelper.findArticleDetailRandWithMember(member, memberCategoryIds);
+        return articleHelper.findArticleDetailRandWithMember(member, memberCategoryTypes);
     }
 }

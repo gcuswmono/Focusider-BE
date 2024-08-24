@@ -35,7 +35,7 @@ public class MemberHelper {
                 .orElseThrow(() -> new EntityNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
 
-    public void deleteMember(Member member) {
+    public void deleteMemberHard(Member member) {
         memberRepository.delete(member);
     }
 }

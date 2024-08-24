@@ -2,10 +2,8 @@ package mono.focusider.domain.article.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import mono.focusider.domain.category.domain.Category;
-
-import java.util.ArrayList;
-import java.util.List;
+import mono.focusider.domain.category.type.CategoryType;
+import mono.focusider.domain.category.type.converter.CategoryTypeConverter;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,15 +26,10 @@ public class Article {
     @Column(name = "level", columnDefinition = "INT", nullable = false)
     private Integer level;
 
-    @Column(name = "default_question", columnDefinition = "TEXT", nullable = false)
-    private String question;
+    @Convert(converter = CategoryTypeConverter.class)
+    @Column(name = "article_type", nullable = false)
+    CategoryType categoryType;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "article")
-    @Builder.Default
-    private List<Reading> readings = new ArrayList<>();
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Reading reading;
 }

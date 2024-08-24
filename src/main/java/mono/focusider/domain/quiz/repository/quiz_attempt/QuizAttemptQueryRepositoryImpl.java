@@ -4,6 +4,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import mono.focusider.domain.quiz.domain.QuizAttempt;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.Optional;
 
 import static mono.focusider.domain.quiz.domain.QChoice.choice;
@@ -23,5 +26,17 @@ public class QuizAttemptQueryRepositoryImpl implements QuizAttemptQueryRepositor
                 .leftJoin(quiz.commentary).fetchJoin()
                 .where(quizAttempt.id.eq(id).and(choice.isAnswer.isTrue().or(choice.id.eq(userChoiceId))))
                 .fetchFirst());
+    }
+
+    @Override
+    public Long sumQuizSolveTime(Long memberId, LocalDate statDate) {
+        YearMonth yearMonth = YearMonth.from(statDate);
+        LocalDateTime startDateTime = yearMonth.atDay(1).atStartOfDay();
+        LocalDateTime endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59, 999999999);
+        return queryFactory
+                .select(quizAttempt.time.sum())
+                .from(quizAttempt)
+                .where(quizAttempt.member.id.eq(memberId).and(quizAttempt.createdAt.between(startDateTime, endDateTime)))
+                .fetchOne();
     }
 }

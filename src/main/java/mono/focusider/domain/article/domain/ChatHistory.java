@@ -2,7 +2,6 @@ package mono.focusider.domain.article.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import mono.focusider.domain.member.domain.Member;
 import mono.focusider.global.domain.BaseTimeEntity;
 
 @NoArgsConstructor
@@ -17,8 +16,8 @@ public class ChatHistory extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    @JoinColumn(name = "reading_id", nullable = false)
+    private Reading reading;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id", nullable = false)

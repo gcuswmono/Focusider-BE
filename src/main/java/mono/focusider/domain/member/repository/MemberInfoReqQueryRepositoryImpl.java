@@ -19,6 +19,7 @@ public class MemberInfoReqQueryRepositoryImpl implements MemberInfoReqQueryRepos
         return Optional.ofNullable(queryFactory
                 .select(Projections.constructor(MemberInfoReqDto.class,
                         file.url,
+                        member.name,
                         member.accountId,
                         member.birthDate,
                         member.gender,

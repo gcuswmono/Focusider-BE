@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface MemberQueryRepository {
     Optional<Member> findByIdWithFile(Long memberId);
+    Optional<Member> findByIdWithCategories(Long memberId);
 }

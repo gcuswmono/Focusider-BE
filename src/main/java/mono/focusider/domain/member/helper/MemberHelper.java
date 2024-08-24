@@ -34,4 +34,8 @@ public class MemberHelper {
         return memberRepository.findByIdWithFile(id)
                 .orElseThrow(() -> new EntityNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
+
+    public void deleteMemberHard(Member member) {
+        memberRepository.delete(member);
+    }
 }

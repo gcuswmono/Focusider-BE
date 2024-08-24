@@ -33,6 +33,8 @@ public class QMember extends EntityPathBase<Member> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
+    public final BooleanPath deleted = createBoolean("deleted");
+
     public final EnumPath<mono.focusider.domain.member.type.MemberGenderType> gender = createEnum("gender", mono.focusider.domain.member.type.MemberGenderType.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);

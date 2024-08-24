@@ -6,7 +6,7 @@ import lombok.Builder;
 import java.time.Duration;
 import java.time.LocalDate;
 
-import static mono.focusider.global.utils.redis.RedisExpiredDataType.*;
+import static mono.focusider.global.utils.redis.RedisExpiredDataType.MEMBER_HARD_DELETE;
 
 
 @Builder(access = AccessLevel.PRIVATE)
@@ -23,6 +23,14 @@ public record RedisExpiredData(
                 .build();
     }
 
+    public static RedisExpiredData ofMemberHardDeleted(Long memberId) {
+        return RedisExpiredData
+                .builder()
+                .key(MEMBER_HARD_DELETE.getPrefix() + memberId)
+                .defaultValue(MEMBER_HARD_DELETE.getDefaultValue())
+                .expiredTime(MEMBER_HARD_DELETE.getDeadLine())
+                .build();
+    }
 
     private static Long calcExpiredTime(LocalDate expiredDate) {
         LocalDate now = LocalDate.now();

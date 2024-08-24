@@ -10,16 +10,19 @@ import mono.focusider.domain.file.helper.FileHelper;
 import mono.focusider.domain.file.validate.FileValidate;
 import mono.focusider.domain.member.domain.Member;
 import mono.focusider.domain.member.dto.req.MemberCategorySaveReqDto;
-import mono.focusider.domain.member.dto.req.MemberUpdateReqDto;
 import mono.focusider.domain.member.dto.req.MemberInfoReqDto;
+import mono.focusider.domain.member.dto.req.MemberUpdateReqDto;
 import mono.focusider.domain.member.helper.MemberHelper;
 import mono.focusider.domain.member.type.ReadingHardType;
 import mono.focusider.domain.member.type.ReadingTermType;
 import mono.focusider.global.aspect.member.MemberInfoParam;
+import mono.focusider.global.utils.redis.RedisUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static mono.focusider.global.utils.redis.RedisExpiredData.ofMemberHardDeleted;
 
 @Slf4j
 @Service
@@ -32,6 +35,7 @@ public class MemberService {
     private final MemberCategoryMapper memberCategoryMapper;
     private final FileHelper fileHelper;
     private final FileValidate fileValidate;
+    private final RedisUtils redisUtils;
 
     @Transactional
     public void createMemberCategory(MemberCategorySaveReqDto memberCategorySaveReqDto) {
@@ -55,6 +59,13 @@ public class MemberService {
         fileValidate.validateFileAndUpdateUnUsed(member.getProfileImageFile());
         member.updateMemberInfo(file, memberUpdateReqDto.name());
         fileValidate.validateFileAndUpdateUsed(file);
+    }
+
+    @Transactional
+    public void deleteMember(MemberInfoParam memberInfoParam) {
+        Member member = memberHelper.findMemberByIdOrThrow(memberInfoParam.memberId());
+        member.deleteMemberSoft();
+        redisUtils.setDataWithExpireTime(ofMemberHardDeleted(member.getId()));
     }
 
     private Integer settingLevel(MemberCategorySaveReqDto memberCategorySaveReqDto) {

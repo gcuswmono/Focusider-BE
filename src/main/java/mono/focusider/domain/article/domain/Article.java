@@ -2,21 +2,34 @@ package mono.focusider.domain.article.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import mono.focusider.domain.member.domain.Member;
-import mono.focusider.global.domain.BaseTimeEntity;
+import mono.focusider.domain.category.domain.Category;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(access = AccessLevel.PRIVATE)
 @Getter
 @Entity
-public class Article extends BaseTimeEntity {
+public class Article {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "article_id")
-    private Long id;
+    private Long article_id;
+
     @Column(name = "title", columnDefinition = "TEXT", nullable = false)
     private String title;
+
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     private String content;
+
+    @Column(name = "level", columnDefinition = "INT", nullable = false)
+    private Integer level;
+
+    @Column(name = "default_question", columnDefinition = "TEXT", nullable = false)
+    private String question;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+
 }

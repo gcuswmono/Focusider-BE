@@ -10,25 +10,26 @@ import mono.focusider.global.domain.BaseTimeEntity;
 @Builder(access = AccessLevel.PRIVATE)
 @Getter
 @Entity
-public class Reading extends BaseTimeEntity {
-
+public class ChatHistory extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "reading_id")
+    @Column(name = "chat_history_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id", nullable = false)
     private Article article;
 
-    @Column(name = "reading_time", nullable = false)
-    private Long readingTime;
-
-    @Column(name = "summary", nullable = false)
+    @Column(name = "question", nullable = false)
     @Builder.Default
-    private String summary = "";
+    private String question = "";
+
+    @Column(name = "answer")
+    @Builder.Default
+    private String answer = "";
+
 }

@@ -1,6 +1,7 @@
 package mono.focusider.domain.article.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.article.domain.Article;
 import mono.focusider.domain.article.domain.ChatHistory;
 import mono.focusider.domain.article.domain.Reading;
@@ -21,6 +22,10 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jakarta.transaction.Transactional;
 
 import java.util.ArrayList;
@@ -28,6 +33,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ChatService {
 
     private final OpenAiChatModel chatModel;
@@ -35,17 +41,14 @@ public class ChatService {
     private final ArticleRepository articleRepository;
     private final RedisUtils redisUtils;
     private final ChatMapper chatMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * 0번: 첫 번째 질문 처리 및 Article 정보 저장
      */
-    public ChatResDto startChat(ChatStartReqDto requestDto) {
+    public ChatResDto startChat(ChatStartReqDto requestDto) throws JsonProcessingException {
         Long memberId = requestDto.memberId();
         String sessionId = String.valueOf(memberId); // 세션 ID는 사용자 ID로 설정
-
-        // Redis에 세션 ID와 만료 시간 저장 (30분)
-        redisUtils.setDataWithExpireTime(
-                RedisExpiredData.ofChatSession(sessionId, memberId.toString(), 1800L));
 
         // Article 조회
         Article article = articleRepository.findById(requestDto.articleId())
@@ -65,9 +68,12 @@ public class ChatService {
         AssistantMessage aiMessage = new AssistantMessage(gptResponse);
         conversationHistory.add(aiMessage);
 
-        // Redis에 대화 기록 저장 및 만료 시간 갱신
+        // conversationHistory를 JSON으로 직렬화하여 Redis에 저장
+        String conversationHistoryJson = objectMapper.writeValueAsString(conversationHistory);
+
+        log.info("Conversation History JSON: {}", conversationHistoryJson);
         redisUtils.setDataWithExpireTime(
-                RedisExpiredData.ofChatSession(sessionId, conversationHistory.toString(), 1800L));
+                RedisExpiredData.ofChatSession(sessionId, conversationHistoryJson, 1800L));
 
         return chatMapper.toChatResponseDto(memberId, gptResponse);
     }
@@ -75,9 +81,13 @@ public class ChatService {
     /**
      * 1번: 질문과 답변을 받아서 Redis에 이어 저장
      */
-    public void addMessageToChatHistory(Long memberId, String question, String answer) {
+    public void addMessageToChatHistory(Long memberId, String question, String answer) throws JsonProcessingException {
         String sessionId = String.valueOf(memberId);
-        List<Message> conversationHistory = (List<Message>) redisUtils.getData(sessionId);
+        // Redis에서 기존 대화 기록을 가져옴 (JSON 형식으로 역직렬화)
+        String conversationHistoryJson = (String) redisUtils.getData(sessionId);
+        List<Message> conversationHistory = objectMapper.readValue(conversationHistoryJson,
+                new TypeReference<List<Message>>() {
+                });
 
         if (conversationHistory == null) {
             throw new IllegalStateException("No chat history found for this session.");
@@ -95,11 +105,14 @@ public class ChatService {
     /**
      * 2번: GPT에게 이어지는 질문 요청 (아동 대상 친근한 질문)
      */
-    public ChatResDto continueChat(ChatContinueReqDto requestDto) {
+    public ChatResDto continueChat(ChatContinueReqDto requestDto) throws JsonProcessingException {
         String sessionId = requestDto.memberId().toString();
 
-        // Redis에서 기존 대화 기록을 가져옴
-        List<Message> conversationHistory = (List<Message>) redisUtils.getData(sessionId);
+        // Redis에서 기존 대화 기록을 가져옴 (JSON 형식으로 역직렬화)
+        String conversationHistoryJson = (String) redisUtils.getData(sessionId);
+        List<Message> conversationHistory = objectMapper.readValue(conversationHistoryJson,
+                new TypeReference<List<Message>>() {
+                });
 
         if (conversationHistory == null) {
             throw new IllegalStateException("No chat history found for this session.");
@@ -112,9 +125,12 @@ public class ChatService {
         AssistantMessage aiMessage = new AssistantMessage(gptResponse);
         conversationHistory.add(aiMessage);
 
-        // Redis에 대화 기록 저장 및 만료 시간 갱신
+        // Redis에 대화 기록 저장 (JSON으로 직렬화하여 저장)
+        String updatedConversationHistoryJson = objectMapper.writeValueAsString(conversationHistory);
+
+        log.info("Updated Conversation History JSON: {}", updatedConversationHistoryJson);
         redisUtils.setDataWithExpireTime(
-                RedisExpiredData.ofChatSession(sessionId, conversationHistory.toString(), 1800L));
+                RedisExpiredData.ofChatSession(sessionId, updatedConversationHistoryJson, 1800L));
 
         // 응답 반환
         return chatMapper.toChatResponseDto(Long.parseLong(sessionId), gptResponse);
@@ -123,9 +139,12 @@ public class ChatService {
     /**
      * 3번: GPT로부터 요약 및 이해도 평가 요청
      */
-    public Long evaluateUnderstanding(ChatContinueReqDto requestDto) {
+    public Long evaluateUnderstanding(ChatContinueReqDto requestDto) throws JsonProcessingException {
         String sessionId = requestDto.memberId().toString();
-        List<Message> conversationHistory = (List<Message>) redisUtils.getData(sessionId);
+        String conversationHistoryJson = (String) redisUtils.getData(sessionId);
+        List<Message> conversationHistory = objectMapper.readValue(conversationHistoryJson,
+                new TypeReference<List<Message>>() {
+                });
 
         if (conversationHistory == null) {
             throw new IllegalStateException("No chat history found for this session.");
@@ -142,18 +161,21 @@ public class ChatService {
     }
 
     /**
-     * 4번: Redis 데이터를 MySQL에 저장
+     * 4번: Redis 데이터를 MariaDB에 저장
      */
     @Transactional
-    public void saveChatHistoryToDB(Long memberId) {
+    public void saveChatHistoryToDB(Long memberId) throws JsonProcessingException {
         String sessionId = String.valueOf(memberId);
-        List<Message> conversationHistory = (List<Message>) redisUtils.getData(sessionId);
+        String conversationHistoryJson = (String) redisUtils.getData(sessionId);
+        List<Message> conversationHistory = objectMapper.readValue(conversationHistoryJson,
+                new TypeReference<List<Message>>() {
+                });
 
         if (conversationHistory == null) {
             throw new IllegalStateException("No chat history found for this session.");
         }
 
-        // ChatHistory와 Reading 데이터를 MySQL에 저장하는 로직 추가
+        // ChatHistory와 Reading 데이터를 MariaDB에 저장하는 로직 추가
         ChatHistory chatHistory = new ChatHistory();
         // 데이터 매핑 및 저장
         chatHistoryRepository.save(chatHistory);

@@ -72,7 +72,7 @@ public class QuizController {
     }
 
     @Operation(summary = "특정 퀴즈 상세", description = "특정 퀴즈 상세", responses = {
-            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = QuizWrongResDto.class))),
+            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = QuizGetResDto.class))),
             @ApiResponse(responseCode = "500", description = "에러")
     })
     @GetMapping("/{quizId}")

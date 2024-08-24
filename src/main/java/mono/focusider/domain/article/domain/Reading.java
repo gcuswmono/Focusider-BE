@@ -31,4 +31,8 @@ public class Reading extends BaseTimeEntity {
     @Column(name = "summary", nullable = false)
     @Builder.Default
     private String summary = "";
+
+    @Column(name = "understating", nullable = false)
+    @Builder.Default
+    private Integer understating = 0;
 }

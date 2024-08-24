@@ -2,6 +2,7 @@ package mono.focusider.domain.member.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import mono.focusider.domain.article.domain.Reading;
 import mono.focusider.domain.attendance.domain.Attendance;
 import mono.focusider.domain.auth.dto.req.SignupReqDto;
 import mono.focusider.domain.category.domain.MemberCategory;
@@ -10,6 +11,7 @@ import mono.focusider.domain.member.type.MemberGenderType;
 import mono.focusider.domain.member.type.MemberRole;
 import mono.focusider.domain.member.type.converter.MemberGenderTypeConverter;
 import mono.focusider.domain.member.type.converter.MemberRoleConverter;
+import mono.focusider.domain.quiz.domain.QuizAttempt;
 import mono.focusider.global.domain.BaseTimeEntity;
 import org.hibernate.type.YesNoConverter;
 
@@ -60,6 +62,14 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Attendance> attendances = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<QuizAttempt> quizAttempts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Reading> readings = new ArrayList<>();
 
     public static Member createMember(SignupReqDto signupReqDto, File profileImageFile, String password) {
         return Member

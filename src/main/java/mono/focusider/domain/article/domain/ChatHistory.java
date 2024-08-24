@@ -7,7 +7,7 @@ import mono.focusider.global.domain.BaseTimeEntity;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder(access = AccessLevel.PRIVATE)
+@Builder(access = AccessLevel.PUBLIC)
 @Getter
 @Entity
 public class ChatHistory extends BaseTimeEntity {
@@ -24,12 +24,10 @@ public class ChatHistory extends BaseTimeEntity {
     @JoinColumn(name = "article_id", nullable = false)
     private Article article;
 
-    @Column(name = "question", nullable = false)
-    @Builder.Default
-    private String question = "";
+    @Column(name = "question")
+    private String question;
 
     @Column(name = "answer")
-    @Builder.Default
-    private String answer = "";
+    private String answer;
 
 }

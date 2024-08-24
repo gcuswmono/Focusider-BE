@@ -11,6 +11,7 @@ import java.util.List;
 
 import static mono.focusider.domain.article.domain.QArticle.article;
 import static mono.focusider.domain.article.domain.QReading.reading;
+import static mono.focusider.domain.category.domain.QCategory.category;
 
 @RequiredArgsConstructor
 public class ArticleDetailDtoQueryRepositoryImpl implements ArticleDetailDtoQueryRepository{
@@ -22,9 +23,11 @@ public class ArticleDetailDtoQueryRepositoryImpl implements ArticleDetailDtoQuer
                 .select(Projections.constructor(ArticleDetailResDto.class,
                         article.article_id,
                         article.title,
-                        article.content))
+                        article.content,
+                        article.category.categoryType))
                 .from(article)
                 .leftJoin(article.readings, reading)
+                .leftJoin(article.category, category)
                 .where(article.category.id.in(categoryIds).and(article.level.eq(member.getLevel()))
                         .and(reading.isNull().or(reading.member.id.ne(member.getId()))))
                 .orderBy(Expressions.numberTemplate(Double.class, "RAND()").asc())

@@ -24,16 +24,10 @@ public class ChatHistory extends BaseTimeEntity {
     @JoinColumn(name = "article_id", nullable = false)
     private Article article;
 
-    @Column(name = "reading_time")
-    private Long readingTime;
-
     @Column(name = "question")
-    private String questions;
+    private String question;
 
-    @Column(name = "answers")
-    private String answers;
-
-    @Column(name = "summary")
-    private String summary;
+    @Column(name = "answer")
+    private String answer;
 
 }

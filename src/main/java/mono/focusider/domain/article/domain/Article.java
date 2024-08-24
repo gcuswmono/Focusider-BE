@@ -25,9 +25,6 @@ public class Article {
     @Column(name = "level", columnDefinition = "INT", nullable = false)
     private Integer level;
 
-    @Column(name = "default_question", columnDefinition = "TEXT", nullable = false)
-    private String question;
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;

@@ -25,9 +25,10 @@ public class Reading extends BaseTimeEntity {
     @JoinColumn(name = "article_id", nullable = false)
     private Article article;
 
-    @Column(name = "reading_time")
+    @Column(name = "reading_time", nullable = false)
     private Long readingTime;
 
-    @Column(name = "summary")
-    private String summary;
+    @Column(name = "summary", nullable = false)
+    @Builder.Default
+    private String summary = "";
 }

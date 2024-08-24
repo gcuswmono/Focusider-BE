@@ -54,6 +54,10 @@ public class QMember extends EntityPathBase<Member> {
 
     public final mono.focusider.domain.file.domain.QFile profileImageFile;
 
+    public final ListPath<mono.focusider.domain.quiz.domain.QuizAttempt, mono.focusider.domain.quiz.domain.QQuizAttempt> quizAttempts = this.<mono.focusider.domain.quiz.domain.QuizAttempt, mono.focusider.domain.quiz.domain.QQuizAttempt>createList("quizAttempts", mono.focusider.domain.quiz.domain.QuizAttempt.class, mono.focusider.domain.quiz.domain.QQuizAttempt.class, PathInits.DIRECT2);
+
+    public final ListPath<mono.focusider.domain.article.domain.Reading, mono.focusider.domain.article.domain.QReading> readings = this.<mono.focusider.domain.article.domain.Reading, mono.focusider.domain.article.domain.QReading>createList("readings", mono.focusider.domain.article.domain.Reading.class, mono.focusider.domain.article.domain.QReading.class, PathInits.DIRECT2);
+
     public QMember(String variable) {
         this(Member.class, forVariable(variable), INITS);
     }

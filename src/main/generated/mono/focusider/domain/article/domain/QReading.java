@@ -40,6 +40,8 @@ public class QReading extends EntityPathBase<Reading> {
 
     public final StringPath summary = createString("summary");
 
+    public final NumberPath<Integer> understating = createNumber("understating", Integer.class);
+
     public QReading(String variable) {
         this(Reading.class, forVariable(variable), INITS);
     }

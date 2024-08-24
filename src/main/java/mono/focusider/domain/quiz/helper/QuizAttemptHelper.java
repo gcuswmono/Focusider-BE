@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+
 import static mono.focusider.domain.quiz.error.QuizErrorCode.QUIZ_REPORT_NOT_FOUND;
 
 @Component
@@ -30,5 +32,9 @@ public class QuizAttemptHelper {
     public QuizAttempt findQuizAttemptAndQuizById(Long id, Long userChoiceId) {
         return quizAttemptRepository.findQuizAttemptAndQuizByIdAndUserChoiceId(id, userChoiceId)
                 .orElseThrow(() -> new EntityNotFoundException(QUIZ_REPORT_NOT_FOUND));
+    }
+
+    public Long sumQuizSolveTime(Long memberId, LocalDate statDate) {
+        return quizAttemptRepository.sumQuizSolveTime(memberId, statDate);
     }
 }

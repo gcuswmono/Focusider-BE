@@ -9,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.member.dto.req.MemberCategorySaveReqDto;
 import mono.focusider.domain.member.dto.req.MemberInfoReqDto;
+import mono.focusider.domain.member.dto.req.MemberStatReqDto;
 import mono.focusider.domain.member.dto.req.MemberUpdateReqDto;
+import mono.focusider.domain.member.dto.res.MemberStatResDto;
 import mono.focusider.domain.member.service.MemberService;
 import mono.focusider.global.annotation.MemberInfo;
 import mono.focusider.global.aspect.member.MemberInfoParam;
@@ -63,5 +65,16 @@ public class MemberController {
     public ResponseEntity<SuccessResponse<?>> deleteMember(@MemberInfo MemberInfoParam memberInfoParam) {
         memberService.deleteMember(memberInfoParam);
         return SuccessResponse.ok(null);
+    }
+
+    @Operation(summary = "통계", description = "통계 아티클 읽는 시간, 이해도", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = MemberStatResDto.class))),
+            @ApiResponse(responseCode = "500", description = "에러")
+    })
+    @GetMapping("/stat")
+    public ResponseEntity<SuccessResponse<?>> getMemberStat(@MemberInfo MemberInfoParam memberInfoParam,
+                                                            @RequestBody MemberStatReqDto reqDto) {
+        MemberStatResDto result = memberService.findMemberMonthlyStat(memberInfoParam, reqDto);
+        return SuccessResponse.ok(result);
     }
 }

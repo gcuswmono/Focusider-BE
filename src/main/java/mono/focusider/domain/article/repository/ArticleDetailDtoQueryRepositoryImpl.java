@@ -5,6 +5,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import mono.focusider.domain.article.dto.res.ArticleDetailResDto;
+import mono.focusider.domain.category.type.CategoryType;
 import mono.focusider.domain.member.domain.Member;
 
 import java.util.List;
@@ -18,17 +19,16 @@ public class ArticleDetailDtoQueryRepositoryImpl implements ArticleDetailDtoQuer
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public ArticleDetailResDto findArticleDetailDto(Member member, List<Long> categoryIds) {
+    public ArticleDetailResDto findArticleDetailDto(Member member, List<CategoryType> categoryTypes) {
         return queryFactory
                 .select(Projections.constructor(ArticleDetailResDto.class,
                         article.article_id,
                         article.title,
                         article.content,
-                        article.category.categoryType))
+                        article.categoryType))
                 .from(article)
-                .leftJoin(article.readings, reading)
-                .leftJoin(article.category, category)
-                .where(article.category.id.in(categoryIds).and(article.level.eq(member.getLevel()))
+                .leftJoin(article.reading, reading)
+                .where(article.categoryType.in(categoryTypes).and(article.level.eq(member.getLevel()))
                         .and(reading.isNull().or(reading.member.id.ne(member.getId()))))
                 .orderBy(Expressions.numberTemplate(Double.class, "RAND()").asc())
                 .fetchOne();

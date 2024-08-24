@@ -12,7 +12,8 @@ import mono.focusider.global.domain.BaseTimeEntity;
 @Entity
 public class Reading extends BaseTimeEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "reading_id")
     private Long id;
 
@@ -23,4 +24,10 @@ public class Reading extends BaseTimeEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id", nullable = false)
     private Article article;
+
+    @Column(name = "reading_time")
+    private Long readingTime;
+
+    @Column(name = "summary")
+    private String summary;
 }

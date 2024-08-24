@@ -74,6 +74,7 @@ public class MemberController {
     @GetMapping("/stat")
     public ResponseEntity<SuccessResponse<?>> getMemberStat(@MemberInfo MemberInfoParam memberInfoParam,
                                                             @RequestBody MemberStatReqDto reqDto) {
-
+        MemberStatResDto result = memberService.findMemberMonthlyStat(memberInfoParam, reqDto);
+        return SuccessResponse.ok(result);
     }
 }

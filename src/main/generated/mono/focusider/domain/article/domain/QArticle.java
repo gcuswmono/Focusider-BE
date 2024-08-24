@@ -24,13 +24,13 @@ public class QArticle extends EntityPathBase<Article> {
 
     public final NumberPath<Long> article_id = createNumber("article_id", Long.class);
 
-    public final mono.focusider.domain.category.domain.QCategory category;
+    public final EnumPath<mono.focusider.domain.category.type.CategoryType> categoryType = createEnum("categoryType", mono.focusider.domain.category.type.CategoryType.class);
 
     public final StringPath content = createString("content");
 
     public final NumberPath<Integer> level = createNumber("level", Integer.class);
 
-    public final ListPath<Reading, QReading> readings = this.<Reading, QReading>createList("readings", Reading.class, QReading.class, PathInits.DIRECT2);
+    public final QReading reading;
 
     public final StringPath title = createString("title");
 
@@ -52,7 +52,7 @@ public class QArticle extends EntityPathBase<Article> {
 
     public QArticle(Class<? extends Article> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.category = inits.isInitialized("category") ? new mono.focusider.domain.category.domain.QCategory(forProperty("category")) : null;
+        this.reading = inits.isInitialized("reading") ? new QReading(forProperty("reading"), inits.get("reading")) : null;
     }
 
 }

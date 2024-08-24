@@ -54,4 +54,14 @@ public class MemberController {
         MemberInfoReqDto result = memberService.findMemberInfo(memberInfoParam);
         return SuccessResponse.ok(result);
     }
+
+    @Operation(summary = "회원 탈퇴", description = "회원 탈퇴", responses = {
+            @ApiResponse(responseCode = "200",  description = "삭제 완료"),
+            @ApiResponse(responseCode = "500", description = "에러")
+    })
+    @DeleteMapping
+    public ResponseEntity<SuccessResponse<?>> deleteMember(@MemberInfo MemberInfoParam memberInfoParam) {
+        memberService.deleteMember(memberInfoParam);
+        return SuccessResponse.ok(null);
+    }
 }

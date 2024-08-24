@@ -11,6 +11,7 @@ import mono.focusider.domain.member.type.MemberRole;
 import mono.focusider.domain.member.type.converter.MemberGenderTypeConverter;
 import mono.focusider.domain.member.type.converter.MemberRoleConverter;
 import mono.focusider.global.domain.BaseTimeEntity;
+import org.hibernate.type.YesNoConverter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -47,6 +48,11 @@ public class Member extends BaseTimeEntity {
     @Convert(converter = MemberRoleConverter.class)
     private MemberRole memberRole;
 
+    @Column(name = "deleted_YN", nullable = false)
+    @Convert(converter = YesNoConverter.class)
+    @Builder.Default
+    private Boolean deleted = Boolean.FALSE;
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<MemberCategory> memberCategories = new ArrayList<>();
@@ -80,5 +86,9 @@ public class Member extends BaseTimeEntity {
     public void updateMemberInfo(File profileImageFile, String name) {
         this.profileImageFile = profileImageFile;
         this.name = name;
+    }
+
+    public void deleteMemberSoft() {
+        this.deleted = true;
     }
 }

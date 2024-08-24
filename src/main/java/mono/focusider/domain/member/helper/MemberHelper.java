@@ -20,6 +20,11 @@ public class MemberHelper {
                 .orElseThrow(() -> new EntityNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
 
+    public Member findMemberByIdWithCategoriesOrThrow(Long memberId) {
+        return memberRepository.findByIdWithCategories(memberId)
+                .orElseThrow(() -> new EntityNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+    }
+
     public Member findMemberByIdOrThrow(Long id) {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
@@ -33,5 +38,9 @@ public class MemberHelper {
     public Member findMemberByIdWithFileOrThrow(Long id) {
         return memberRepository.findByIdWithFile(id)
                 .orElseThrow(() -> new EntityNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    public void deleteMemberHard(Member member) {
+        memberRepository.delete(member);
     }
 }

@@ -28,12 +28,19 @@ public class QuizAttemptWrongQueryRepositoryImpl implements QuizAttemptWrongQuer
 
     @Override
     public Page<QuizInfo> getQuizAttemptWrong(Pageable pageable, Long memberId) {
-        List<QuizInfo> contents = queryFactory
+        List<Long> quizAttemptIds = queryFactory
+                .select(quizAttempt.id)
                 .from(quizAttempt)
+                .where(quizAttempt.member.id.eq(memberId))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+        List<QuizInfo> contents = queryFactory
+                .selectFrom(quizAttempt)
                 .leftJoin(quizAttempt.quiz, quiz)
                 .leftJoin(quiz.quizKeywords, quizKeyword)
                 .leftJoin(quizKeyword.keyword, keyword)
-                .where(quizAttempt.member.id.eq(memberId))
+                .where(quizAttempt.id.in(quizAttemptIds))
                 .transform(groupBy(quizAttempt.id).list(
                         Projections.constructor(QuizInfo.class,
                                 quiz.id,
@@ -50,12 +57,10 @@ public class QuizAttemptWrongQueryRepositoryImpl implements QuizAttemptWrongQuer
                                         .otherwise((LocalDateTime) null)
                         )
                 ));
-
         JPAQuery<Long> countQuery = queryFactory
                 .select(quizAttempt.id.countDistinct())
                 .from(quizAttempt)
                 .where(quizAttempt.member.id.eq(memberId));
-
         return PageableExecutionUtils.getPage(contents, pageable, countQuery::fetchCount);
     }
 }

@@ -21,4 +21,14 @@ public class MemberQueryRepositoryImpl implements MemberQueryRepository{
                 .where(member.id.eq(memberId))
                 .fetchOne());
     }
+
+    @Override
+    public Optional<Member> findByIdWithCategories(Long memberId) {
+        return Optional.ofNullable(queryFactory
+                .selectFrom(member)
+                .leftJoin(member.memberCategories).fetchJoin()
+                .where(member.id.eq(memberId))
+                .fetchOne()
+        );
+    }
 }

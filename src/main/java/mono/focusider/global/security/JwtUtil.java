@@ -93,7 +93,7 @@ public class JwtUtil {
     }
 
     public void addAccessTokenToCookie(HttpServletResponse response, String accessToken) {
-        int cookieMaxAge = Math.toIntExact(accessTokenExpireTime / 1000);
+        int cookieMaxAge = Math.toIntExact(refreshTokenExpireTime / 1000);
         Cookie accessTokenCookie = CookieUtils.createCookie(ACCESS_TOKEN_NAME.getDesc(), accessToken);
         CookieUtils.addCookieWithMaxAge(response, accessTokenCookie, cookieMaxAge);
     }

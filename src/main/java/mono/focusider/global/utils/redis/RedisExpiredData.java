@@ -8,13 +8,11 @@ import java.time.LocalDate;
 
 import static mono.focusider.global.utils.redis.RedisExpiredDataType.MEMBER_HARD_DELETE;
 
-
 @Builder(access = AccessLevel.PRIVATE)
 public record RedisExpiredData(
         String key,
         String defaultValue,
-        Long expiredTime
-) {
+        Long expiredTime) {
     public static RedisExpiredData ofToken(String accessToken, String refreshToken, Long refreshTokenExpiredTime) {
         return RedisExpiredData.builder()
                 .key(accessToken)
@@ -29,6 +27,15 @@ public record RedisExpiredData(
                 .key(MEMBER_HARD_DELETE.getPrefix() + memberId)
                 .defaultValue(MEMBER_HARD_DELETE.getDefaultValue())
                 .expiredTime(MEMBER_HARD_DELETE.getDeadLine())
+                .build();
+    }
+
+    public static RedisExpiredData ofChatSession(String sessionId, String memberId, Long expiredTime) {
+        return RedisExpiredData
+                .builder()
+                .key("chat_session:" + sessionId)
+                .defaultValue(memberId)
+                .expiredTime(expiredTime)
                 .build();
     }
 

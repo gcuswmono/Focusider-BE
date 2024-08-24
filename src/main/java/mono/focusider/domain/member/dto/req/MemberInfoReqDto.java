@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 public record MemberInfoReqDto(
         String profileImageUrl,
+        String name,
         String accountId,
         LocalDate birthDay,
         MemberGenderType memberGenderType,

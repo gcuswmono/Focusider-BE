@@ -36,6 +36,10 @@ public class QReading extends EntityPathBase<Reading> {
 
     public final mono.focusider.domain.member.domain.QMember member;
 
+    public final NumberPath<Long> readingTime = createNumber("readingTime", Long.class);
+
+    public final StringPath summary = createString("summary");
+
     public QReading(String variable) {
         this(Reading.class, forVariable(variable), INITS);
     }
@@ -54,7 +58,7 @@ public class QReading extends EntityPathBase<Reading> {
 
     public QReading(Class<? extends Reading> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.article = inits.isInitialized("article") ? new QArticle(forProperty("article")) : null;
+        this.article = inits.isInitialized("article") ? new QArticle(forProperty("article"), inits.get("article")) : null;
         this.member = inits.isInitialized("member") ? new mono.focusider.domain.member.domain.QMember(forProperty("member"), inits.get("member")) : null;
     }
 

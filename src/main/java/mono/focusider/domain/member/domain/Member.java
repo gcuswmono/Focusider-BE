@@ -87,4 +87,8 @@ public class Member extends BaseTimeEntity {
         this.profileImageFile = profileImageFile;
         this.name = name;
     }
+
+    public void deleteMemberSoft() {
+        this.deleted = true;
+    }
 }

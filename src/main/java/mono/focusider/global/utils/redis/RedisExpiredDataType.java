@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public enum RedisExpiredDataType {
-    MEMBER_HARD_DELETE("member_deleted:", "1", 1209600000L);
+    MEMBER_HARD_DELETE("member_deleted:", "deleted", 1209600000L);
 
     private final String prefix;
     private final String defaultValue;

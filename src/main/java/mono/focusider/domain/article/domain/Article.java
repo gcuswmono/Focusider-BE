@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import mono.focusider.domain.category.domain.Category;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(access = AccessLevel.PRIVATE)
@@ -29,4 +32,8 @@ public class Article {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "article")
+    @Builder.Default
+    private List<Reading> readings = new ArrayList<>();
 }

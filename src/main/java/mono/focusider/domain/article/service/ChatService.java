@@ -83,6 +83,7 @@ public class ChatService {
         Long memberId = getMemberIdFromToken(request);
 
         // 필수 정보 검증: initialAnswer
+        // validateChatRequest(requestDto.initialAnswer(), "Initial answer is missing");
         validateChatRequest(requestDto.initialAnswer(), "Initial answer is missing");
 
         String sessionId = String.valueOf(memberId); // 세션 ID는 사용자 ID로 설정

@@ -29,20 +29,12 @@ public class ChatHistory extends BaseTimeEntity {
     @Column(name = "answer")
     private String answer;
 
-    // 질문을 저장할 때 사용
-    public static ChatHistory createWithQuestion(Reading reading, Article article, String question) {
+    // 질문과 답변을 저장할 때 사용
+    public static ChatHistory createWithQuestionAnsAnswer(Reading reading, Article article, String question, String answer) {
         return ChatHistory.builder()
                 .reading(reading)
                 .article(article)
                 .question(question)
-                .build();
-    }
-
-    // 답변을 저장할 때 사용
-    public static ChatHistory createWithAnswer(Reading reading, Article article, String answer) {
-        return ChatHistory.builder()
-                .reading(reading)
-                .article(article)
                 .answer(answer)
                 .build();
     }

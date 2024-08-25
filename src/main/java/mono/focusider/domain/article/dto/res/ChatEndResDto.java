@@ -4,12 +4,12 @@ import lombok.AccessLevel;
 import lombok.Builder;
 
 @Builder(access = AccessLevel.PRIVATE)
-public record ChatResDto(
-        String question) {
-    public static ChatResDto of(String question) {
-        return ChatResDto
+public record ChatEndResDto(
+        String summary) {
+    public static ChatEndResDto of(String summary) {
+        return ChatEndResDto
                 .builder()
-                .question(question)
+                .summary(summary)
                 .build();
     }
 }

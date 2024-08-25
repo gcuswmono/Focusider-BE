@@ -7,6 +7,7 @@ import mono.focusider.domain.article.domain.ChatHistory;
 import mono.focusider.domain.article.domain.Reading;
 import mono.focusider.domain.article.dto.ConversationEntry;
 import mono.focusider.domain.article.dto.req.ChatReqDto;
+import mono.focusider.domain.article.dto.res.ChatEndResDto;
 import mono.focusider.domain.article.dto.res.ChatResDto;
 import mono.focusider.domain.article.mapper.ChatMapper;
 import mono.focusider.domain.article.repository.ArticleRepository;
@@ -190,7 +191,7 @@ public class ChatService {
     }
 
     // 6. 대화 종료 및 이해도 평가 메서드 추가
-    public String evaluateUnderstandingAndEndChat(Long articleId, HttpServletRequest request, Long readTime)
+    public ChatEndResDto evaluateUnderstandingAndEndChat(Long articleId, HttpServletRequest request, Long readTime)
             throws JsonProcessingException {
         Long memberId = getMemberIdFromToken(request);
 
@@ -216,7 +217,7 @@ public class ChatService {
         // 5. Redis 데이터 삭제
         deleteChatFromRedis(memberId);
 
-        return summary; // 요약을 반환
+        return chatMapper.toChatEndResponseDto(summary); // 요약을 반환
     }
 
     // 7. processChat 메서드 - 컨트롤러에서 호출
@@ -243,7 +244,7 @@ public class ChatService {
         String gptQuestion = generateNextQuestion(conversationHistory);
 
         // GPT 질문 반환 (저장하지 않음)
-        return chatMapper.toChatResponseDto(memberId, gptQuestion);
+        return chatMapper.toChatResponseDto(gptQuestion);
     }
 
     public void deleteChatFromRedis(Long memberId) {

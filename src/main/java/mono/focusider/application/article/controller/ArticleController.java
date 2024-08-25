@@ -13,11 +13,17 @@ import mono.focusider.domain.article.dto.req.ChatEndReqDto;
 import mono.focusider.domain.article.dto.req.ChatReqDto;
 import mono.focusider.domain.article.dto.res.ArticleDetailResDto;
 import mono.focusider.domain.article.dto.res.ChatResDto;
+import mono.focusider.domain.article.dto.res.ReadingDetailResDto;
+import mono.focusider.domain.article.dto.res.ReadingListDto;
 import mono.focusider.domain.article.service.ArticleService;
 import mono.focusider.domain.article.service.ChatService;
+import mono.focusider.domain.article.service.ReadingService;
 import mono.focusider.global.annotation.MemberInfo;
 import mono.focusider.global.aspect.member.MemberInfoParam;
 import mono.focusider.global.domain.SuccessResponse;
+
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +36,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 @RequiredArgsConstructor
 public class ArticleController {
     private final ArticleService articleService;
+    private final ReadingService readingService;
     private final ChatService chatService;
 
     @Operation(summary = "아티클 랜덤 조회", description = "아티클 랜덤 조회", responses = {
@@ -40,6 +47,30 @@ public class ArticleController {
     public ResponseEntity<SuccessResponse<?>> findArticleRandom(@MemberInfo MemberInfoParam memberInfoParam) {
         ArticleDetailResDto result = articleService.findArticleDetail(memberInfoParam);
         return SuccessResponse.ok(result);
+    }
+
+    // Reading 목록 조회 API 수정
+    @Operation(summary = "읽은 아티클 목록 조회", description = "사용자가 읽은 아티클 목록을 조회합니다.", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ReadingListDto.class))),
+            @ApiResponse(responseCode = "500", description = "에러")
+    })
+    @GetMapping("/reading-list")
+    public ResponseEntity<SuccessResponse<?>> getReadingList(HttpServletRequest request) {
+        List<ReadingListDto> readingList = readingService.getReadingList(request);
+        // SuccessResponse의 제네릭 타입을 명시적으로 지정
+        return SuccessResponse.ok(readingList);
+    }
+
+    // 특정 Reading 상세 조회 API 수정
+    @Operation(summary = "읽은 아티클 상세 조회", description = "특정 아티클의 상세 정보를 조회합니다.", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ReadingDetailResDto.class))),
+            @ApiResponse(responseCode = "404", description = "아티클을 찾을 수 없습니다.")
+    })
+    @GetMapping("/reading-detail/{readingId}")
+    public ResponseEntity<SuccessResponse<?>> getReadingDetail(@PathVariable Long readingId) {
+        ReadingDetailResDto readingDetail = readingService.getReadingDetail(readingId);
+        // 중복된 ResponseEntity.ok 제거
+        return SuccessResponse.ok(readingDetail);
     }
 
     // 통합된 chat API: 대화 시작/이어가기 (하나의 메서드로 통합)

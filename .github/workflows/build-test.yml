@@ -1,4 +1,4 @@
-name: pnpm build test for merge on devlop
+name: gradle build test for merge on devlop
 
 on:
   pull_request:

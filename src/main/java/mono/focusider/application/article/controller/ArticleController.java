@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.article.dto.req.ChatEndReqDto;
 import mono.focusider.domain.article.dto.req.ChatReqDto;
 import mono.focusider.domain.article.dto.res.ArticleDetailResDto;
+import mono.focusider.domain.article.dto.res.ChatEndResDto;
 import mono.focusider.domain.article.dto.res.ChatResDto;
 import mono.focusider.domain.article.service.ArticleService;
 import mono.focusider.domain.article.service.ChatService;
@@ -43,7 +44,11 @@ public class ArticleController {
     }
 
     // 통합된 chat API: 대화 시작/이어가기 (하나의 메서드로 통합)
-    @Operation(summary = "채팅 시작/이어가기", description = "GPT와 대화를 시작하거나 이어서 진행합니다.")
+    @Operation(summary = "채팅 시작/이어가기", description = "GPT와 대화를 시작하거나 이어서 진행합니다.", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ChatResDto.class))),
+            @ApiResponse(responseCode = "400", description = "필수 정보 누락"),
+            @ApiResponse(responseCode = "500", description = "에러")
+    })
     @PostMapping("/chat")
     public ResponseEntity<SuccessResponse<?>> processChat(
             @Valid @RequestBody ChatReqDto requestDto, HttpServletRequest request) {
@@ -66,15 +71,20 @@ public class ArticleController {
     /**
      * 대화를 종료하고 사용자의 이해도를 평가합니다.
      */
-    @Operation(summary = "대화 종료 및 이해도 평가", description = "대화를 종료하고 사용자의 이해도를 평가합니다.")
+    @Operation(summary = "대화 종료 및 이해도 평가", description = "대화를 종료하고 사용자의 이해도를 평가합니다.", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ChatEndResDto.class))),
+            @ApiResponse(responseCode = "400", description = "필수 정보 누락"),
+            @ApiResponse(responseCode = "500", description = "에러")
+    })
     @PostMapping("/end")
     public ResponseEntity<SuccessResponse<?>> evaluateUnderstandingAndEndChat(
             @RequestBody ChatEndReqDto chatEndReqDto, HttpServletRequest request) {
         log.info("Ending chat for articleId={}, readTime={}", chatEndReqDto.articleId(), chatEndReqDto.readTime());
         try {
-            String summary = chatService.evaluateUnderstandingAndEndChat(chatEndReqDto.articleId(), request,
+            ChatEndResDto chatEndResDto = chatService.evaluateUnderstandingAndEndChat(chatEndReqDto.articleId(),
+                    request,
                     chatEndReqDto.readTime());
-            return SuccessResponse.ok(summary);
+            return SuccessResponse.ok(chatEndResDto);
         } catch (IllegalArgumentException e) {
             // 필수 정보 누락 시 400 오류 반환
             return SuccessResponse.badRequest(e.getMessage());

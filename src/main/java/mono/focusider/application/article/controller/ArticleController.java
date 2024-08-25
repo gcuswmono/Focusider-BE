@@ -19,11 +19,7 @@ import mono.focusider.global.annotation.MemberInfo;
 import mono.focusider.global.aspect.member.MemberInfoParam;
 import mono.focusider.global.domain.SuccessResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -44,7 +40,7 @@ public class ArticleController {
         return SuccessResponse.ok(result);
     }
 
-    @PostMapping(value = "/start", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping("/start")
     public ResponseEntity<SuccessResponse<?>> startChat(
             @RequestBody ChatStartReqDto requestDto, HttpServletRequest request) {
         log.info("Received DTO: {}", requestDto);
@@ -60,7 +56,7 @@ public class ArticleController {
         }
     }
 
-    @PostMapping(value = "/continue", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping("/continue")
     public ResponseEntity<SuccessResponse<?>> continueChat(
             @RequestBody ChatContinueReqDto requestDto, HttpServletRequest request) {
         log.info("Received DTO: {}", requestDto);
@@ -76,7 +72,7 @@ public class ArticleController {
         }
     }
 
-    @PostMapping(value = "/evaluate-and-end", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping("/evaluate-and-end")
     public ResponseEntity<SuccessResponse<?>> evaluateUnderstandingAndEndChat(
             @RequestBody ChatContinueReqDto requestDto, HttpServletRequest request) {
         log.info("Received DTO: {}", requestDto);

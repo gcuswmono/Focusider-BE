@@ -25,7 +25,7 @@ public class Reading extends BaseTimeEntity {
     @JoinColumn(name = "article_id", nullable = false)
     private Article article;
 
-    @Column(name = "reading_time", nullable = false)
+    @Column(name = "reading_time")
     private Long readingTime;
 
     @Column(name = "summary", nullable = false)
@@ -35,4 +35,15 @@ public class Reading extends BaseTimeEntity {
     @Column(name = "understating", nullable = false)
     @Builder.Default
     private Integer understating = 0;
+
+    public static Reading createReading(Member member, Article article, Long readingTime, String summary,
+            Integer understandingScore) {
+        return Reading.builder()
+                .member(member)
+                .article(article)
+                .readingTime(readingTime)
+                .summary(summary)
+                .understating(understandingScore)
+                .build();
+    }
 }

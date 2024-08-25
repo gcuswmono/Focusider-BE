@@ -1,7 +1,7 @@
 package mono.focusider.domain.article.dto.req;
 
 public record ChatContinueReqDto(
-        Long memberId,
-        String answer) {
+                Long articleId,
+                String answer) {
 
 }

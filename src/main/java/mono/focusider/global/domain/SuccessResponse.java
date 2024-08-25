@@ -34,6 +34,16 @@ public class SuccessResponse<T> {
                         .build());
     }
 
+    // 400 Bad Request response
+    public static <T> ResponseEntity<SuccessResponse<?>> badRequest(String errorMessage) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(SuccessResponse.builder()
+                        .status(HttpStatus.BAD_REQUEST.value())
+                        .message(errorMessage)
+                        .data(null)
+                        .build());
+    }
+
     public static <T> SuccessResponse<?> of(SuccessCode successCode, T data) {
         return SuccessResponse.builder()
                 .status(successCode.getHttpStatus().value())

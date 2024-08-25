@@ -3,11 +3,17 @@ package mono.focusider.domain.article.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.article.domain.Article;
+import mono.focusider.domain.article.domain.ChatHistory;
+import mono.focusider.domain.article.domain.Reading;
 import mono.focusider.domain.article.dto.ConversationEntry;
 import mono.focusider.domain.article.dto.req.ChatReqDto;
 import mono.focusider.domain.article.dto.res.ChatResDto;
 import mono.focusider.domain.article.mapper.ChatMapper;
 import mono.focusider.domain.article.repository.ArticleRepository;
+import mono.focusider.domain.article.repository.ChatHistoryRepository;
+import mono.focusider.domain.article.repository.ReadingRepository;
+import mono.focusider.domain.member.domain.Member;
+import mono.focusider.domain.member.repository.MemberRepository;
 import mono.focusider.global.utils.redis.RedisExpiredData;
 import mono.focusider.global.utils.redis.RedisUtils;
 import mono.focusider.global.security.JwtUtil;
@@ -36,6 +42,9 @@ public class ChatService {
 
     private final OpenAiChatModel chatModel;
     private final ArticleRepository articleRepository;
+    private final ReadingRepository readingRepository;
+    private final MemberRepository memberRepository;
+    private final ChatHistoryRepository chatHistoryRepository;
     private final RedisUtils redisUtils;
     private final ChatMapper chatMapper;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -183,25 +192,28 @@ public class ChatService {
     public String evaluateUnderstandingAndEndChat(Long articleId, HttpServletRequest request, Long readTime)
             throws JsonProcessingException {
         Long memberId = getMemberIdFromToken(request);
+
+        // Article 엔티티 가져오기
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid article ID"));
-        log.info("checkpoint1 :" + article);
 
-        // Redis에서 채팅 내역 가져오기
+        // Redis에서 대화 기록 가져오기
         List<ConversationEntry> conversationEntries = getChatFromRedis(memberId);
-        log.info("checkpoint2 :" + conversationEntries);
 
         // 1. 요약 생성
         String summary = summarizeConversation(conversationEntries);
-        log.info("checkpoint3 :" + summary);
 
         // 2. 이해도 평가
         Long understandingScore = evaluateUnderstanding(conversationEntries, article);
-        log.info("checkpoint4 :" + understandingScore);
 
-        // 3. Redis 데이터 삭제
+        // 3. Reading 엔티티 저장
+        Reading reading = saveReading(memberId, article, readTime, summary, understandingScore);
+
+        // 4. ChatHistory 엔티티 저장
+        saveChatHistory(reading, article, conversationEntries);
+
+        // 5. Redis 데이터 삭제
         deleteChatFromRedis(memberId);
-        log.info("checkpoint5 : deleteChatFromRedis");
 
         return summary; // 요약을 반환
     }
@@ -219,6 +231,7 @@ public class ChatService {
         } else {
             // 기존 마지막 질문에 대한 답변 추가
             ConversationEntry lastEntry = conversationHistory.get(conversationHistory.size() - 1);
+            lastEntry.setQuestion(requestDto.question());
             lastEntry.setAnswer(requestDto.answer());
         }
 
@@ -234,5 +247,29 @@ public class ChatService {
 
     public void deleteChatFromRedis(Long memberId) {
         redisUtils.deleteData("chat_session:" + memberId);
+    }
+
+    private Reading saveReading(Long memberId, Article article, Long readTime, String summary,
+            Long understandingScore) {
+        // Reading 엔티티 생성
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
+
+        Reading reading = Reading.createReading(member, article, readTime, summary, understandingScore.intValue());
+
+        // Reading 엔티티를 데이터베이스에 저장
+        return readingRepository.save(reading); // 저장된 Reading 엔티티 반환
+    }
+
+    private void saveChatHistory(Reading reading, Article article, List<ConversationEntry> conversationEntries) {
+        // ConversationEntry 리스트를 순회하며 질문과 답변을 ChatHistory에 저장
+        for (ConversationEntry entry : conversationEntries) {
+            // 질문 저장
+            if (entry.getQuestion() != null && entry.getAnswer() != null) {
+                ChatHistory chatHistory = ChatHistory.createWithQuestionAnsAnswer(reading, article,
+                        entry.getQuestion(), entry.getAnswer());
+                chatHistoryRepository.save(chatHistory); // ChatHistory 엔티티 저장
+            }
+        }
     }
 }

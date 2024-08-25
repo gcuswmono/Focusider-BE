@@ -30,11 +30,11 @@ public record RedisExpiredData(
                 .build();
     }
 
-    public static RedisExpiredData ofChatSession(String sessionId, String memberId, Long expiredTime) {
+    public static RedisExpiredData ofChatSession(String sessionId, String conversationHistoryJson, Long expiredTime) {
         return RedisExpiredData
                 .builder()
                 .key("chat_session:" + sessionId)
-                .defaultValue(memberId)
+                .defaultValue(conversationHistoryJson)
                 .expiredTime(expiredTime)
                 .build();
     }

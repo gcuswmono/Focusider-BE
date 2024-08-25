@@ -15,7 +15,7 @@ public class Article {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "article_id")
-    private Long article_id;
+    private Long id;
 
     @Column(name = "title", columnDefinition = "TEXT", nullable = false)
     private String title;
@@ -29,6 +29,9 @@ public class Article {
     @Convert(converter = CategoryTypeConverter.class)
     @Column(name = "article_type", nullable = false)
     CategoryType categoryType;
+
+    @Column(name = "default_question", nullable = false)
+    private String defaultQuestion;
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private Reading reading;

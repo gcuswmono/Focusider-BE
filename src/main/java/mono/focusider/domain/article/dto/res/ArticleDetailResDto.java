@@ -6,6 +6,6 @@ public record ArticleDetailResDto(
         Long articleId,
         String title,
         String content,
-        CategoryType categoryType
-) {
+        String question,
+        CategoryType categoryType) {
 }

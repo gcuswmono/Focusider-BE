@@ -45,7 +45,7 @@ public class QuizController {
     })
     @PostMapping
     public ResponseEntity<SuccessResponse<?>> checkCorrect(@RequestBody QuizCheckReqDto reqDto,
-                                                           @MemberInfo MemberInfoParam memberInfoParam) {
+            @MemberInfo MemberInfoParam memberInfoParam) {
         QuizCheckResDto result = quizService.checkAndSaveQuiz(reqDto, memberInfoParam);
         return SuccessResponse.ok(result);
     }
@@ -66,7 +66,7 @@ public class QuizController {
     })
     @GetMapping("/wrong/list")
     public ResponseEntity<SuccessResponse<?>> getWrongQuizList(@MemberInfo MemberInfoParam memberInfoParam,
-                                                               Pageable pageable) {
+            Pageable pageable) {
         QuizWrongResDto result = quizService.findWrongQuizList(memberInfoParam, pageable);
         return SuccessResponse.ok(result);
     }

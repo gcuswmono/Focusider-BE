@@ -6,13 +6,13 @@ import mono.focusider.global.domain.BaseTimeEntity;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder(access = AccessLevel.PUBLIC)
+@Builder(access = AccessLevel.PRIVATE)
 @Getter
 @Entity
 public class ChatHistory extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "chat_history_id")
+    @Column(name = "chathistory_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,4 +29,21 @@ public class ChatHistory extends BaseTimeEntity {
     @Column(name = "answer")
     private String answer;
 
+    // 질문을 저장할 때 사용
+    public static ChatHistory createWithQuestion(Reading reading, Article article, String question) {
+        return ChatHistory.builder()
+                .reading(reading)
+                .article(article)
+                .question(question)
+                .build();
+    }
+
+    // 답변을 저장할 때 사용
+    public static ChatHistory createWithAnswer(Reading reading, Article article, String answer) {
+        return ChatHistory.builder()
+                .reading(reading)
+                .article(article)
+                .answer(answer)
+                .build();
+    }
 }

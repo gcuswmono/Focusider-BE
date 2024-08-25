@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.article.dto.req.ChatContinueReqDto;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
 
 @Slf4j
 @RestController
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ArticleController {
     private final ArticleService articleService;
+    private final ChatService chatService;
 
     @Operation(summary = "아티클 랜덤 조회", description = "아티클 랜덤 조회", responses = {
             @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ArticleDetailResDto.class))),
@@ -41,62 +44,51 @@ public class ArticleController {
         return SuccessResponse.ok(result);
     }
 
-    private final ChatService chatService;
-
-    /**
-     * Starts a new GPT chat session
-     */
-    @Operation(summary = "Start GPT chat", description = "Start a new chat session with GPT", responses = {
-            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ChatResDto.class))),
-            @ApiResponse(responseCode = "500", description = "Error occurred")
-    })
-    @PostMapping("/start")
+    @PostMapping(value = "/start", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SuccessResponse<?>> startChat(
-            @RequestBody ChatStartReqDto requestDto, @MemberInfo MemberInfoParam memberInfoParam) {
+            @RequestBody ChatStartReqDto requestDto, HttpServletRequest request) {
+        log.info("Received DTO: {}", requestDto);
         try {
-            ChatResDto chatResponse = chatService.startChat(requestDto);
-            return SuccessResponse.ok(chatResponse); // Return standard success response
+            ChatResDto chatResponse = chatService.startChat(requestDto, request);
+            return SuccessResponse.ok(chatResponse);
+        } catch (IllegalArgumentException e) {
+            // 필수 정보 누락 시 400 오류 반환
+            return SuccessResponse.badRequest(e.getMessage());
         } catch (Exception e) {
             log.error("Error starting GPT chat", e);
             return SuccessResponse.error("Failed to start chat");
         }
     }
 
-    /**
-     * Continue an existing GPT chat session
-     */
-    @Operation(summary = "Continue GPT chat", description = "Continue the chat session with GPT", responses = {
-            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ChatResDto.class))),
-            @ApiResponse(responseCode = "500", description = "Error occurred")
-    })
-    @PostMapping("/continue")
+    @PostMapping(value = "/continue", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SuccessResponse<?>> continueChat(
-            @RequestBody ChatContinueReqDto requestDto, @MemberInfo MemberInfoParam memberInfoParam) {
+            @RequestBody ChatContinueReqDto requestDto, HttpServletRequest request) {
+        log.info("Received DTO: {}", requestDto);
         try {
-            ChatResDto chatResponse = chatService.continueChat(requestDto);
-            return SuccessResponse.ok(chatResponse); // Return standard success response
+            ChatResDto chatResponse = chatService.continueChat(requestDto, request);
+            return SuccessResponse.ok(chatResponse);
+        } catch (IllegalArgumentException e) {
+            // 필수 정보 누락 시 400 오류 반환
+            return SuccessResponse.badRequest(e.getMessage());
         } catch (Exception e) {
             log.error("Error continuing GPT chat", e);
             return SuccessResponse.error("Failed to continue chat");
         }
     }
 
-    /**
-     * Evaluate user's understanding from the chat session
-     */
-    @Operation(summary = "Evaluate understanding", description = "Evaluate the user's understanding of the conversation", responses = {
-            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = Long.class))),
-            @ApiResponse(responseCode = "500", description = "Error occurred")
-    })
-    @PostMapping("/evaluate")
-    public ResponseEntity<SuccessResponse<?>> evaluateUnderstanding(
-            @RequestBody ChatContinueReqDto requestDto, @MemberInfo MemberInfoParam memberInfoParam) {
+    @PostMapping(value = "/evaluate-and-end", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SuccessResponse<?>> evaluateUnderstandingAndEndChat(
+            @RequestBody ChatContinueReqDto requestDto, HttpServletRequest request) {
+        log.info("Received DTO: {}", requestDto);
         try {
-            Long understandingScore = chatService.evaluateUnderstanding(requestDto);
-            return SuccessResponse.ok(understandingScore); // Return standard success response
+            Long understandingScore = chatService.evaluateUnderstandingAndEndChat(requestDto.articleId(), request);
+            return SuccessResponse.ok(understandingScore);
+        } catch (IllegalArgumentException e) {
+            // 필수 정보 누락 시 400 오류 반환
+            return SuccessResponse.badRequest(e.getMessage());
         } catch (Exception e) {
-            log.error("Error evaluating understanding", e);
-            return SuccessResponse.error("Failed to evaluate understanding");
+            log.error("Error evaluating understanding and ending chat", e);
+            return SuccessResponse.error("Failed to evaluate and end chat");
         }
     }
 }

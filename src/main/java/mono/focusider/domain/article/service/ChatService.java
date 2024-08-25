@@ -3,27 +3,21 @@ package mono.focusider.domain.article.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.article.domain.Article;
-import mono.focusider.domain.article.domain.ChatHistory;
-import mono.focusider.domain.article.domain.Reading;
-import mono.focusider.domain.article.dto.req.ChatContinueReqDto;
-import mono.focusider.domain.article.dto.req.ChatStartReqDto;
+import mono.focusider.domain.article.dto.ConversationEntry;
+import mono.focusider.domain.article.dto.req.ChatReqDto;
 import mono.focusider.domain.article.dto.res.ChatResDto;
 import mono.focusider.domain.article.mapper.ChatMapper;
-import mono.focusider.domain.article.repository.ChatHistoryRepository;
-import mono.focusider.domain.article.repository.ReadingRepository;
-import mono.focusider.domain.member.domain.Member;
-import mono.focusider.domain.member.helper.MemberHelper;
 import mono.focusider.domain.article.repository.ArticleRepository;
 import mono.focusider.global.utils.redis.RedisExpiredData;
 import mono.focusider.global.utils.redis.RedisUtils;
 import mono.focusider.global.security.JwtUtil;
 import mono.focusider.global.utils.cookie.CookieUtils;
-import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,7 +25,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,31 +35,11 @@ import java.util.List;
 public class ChatService {
 
     private final OpenAiChatModel chatModel;
-    private final ChatHistoryRepository chatHistoryRepository;
     private final ArticleRepository articleRepository;
     private final RedisUtils redisUtils;
     private final ChatMapper chatMapper;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final MemberHelper memberHelper; // 추가
-    private final ReadingRepository readingRepository; // 추가
-    private final JwtUtil jwtUtil; // 추가
-
-    // 필수 정보 검증 로직 추가
-    private void validateChatRequest(String content, String errorMessage) {
-        if (content == null || content.isEmpty()) {
-            throw new IllegalArgumentException(errorMessage);
-        }
-    }
-
-    private List<Message> getConversationHistory(Long memberId) throws JsonProcessingException {
-        String sessionId = memberId.toString();
-        String conversationHistoryJson = (String) redisUtils.getData(sessionId);
-        if (conversationHistoryJson == null) {
-            throw new IllegalStateException("No chat history found for this session.");
-        }
-        return objectMapper.readValue(conversationHistoryJson, new TypeReference<List<Message>>() {
-        });
-    }
+    private final JwtUtil jwtUtil;
 
     private Long getMemberIdFromToken(HttpServletRequest request) {
         String accessToken = CookieUtils.getCookieValueWithName(request, "accessToken");
@@ -76,216 +49,190 @@ public class ChatService {
         return jwtUtil.getMemberId(accessToken); // JWT에서 memberId 추출
     }
 
-    /**
-     * 0번: 첫 번째 질문 처리 및 Article 정보 저장
-     */
-    public ChatResDto startChat(ChatStartReqDto requestDto, HttpServletRequest request) throws JsonProcessingException {
-        Long memberId = getMemberIdFromToken(request);
-
-        // 필수 정보 검증: initialAnswer
-        // validateChatRequest(requestDto.initialAnswer(), "Initial answer is missing");
-        validateChatRequest(requestDto.initialAnswer(), "Initial answer is missing");
-
-        String sessionId = String.valueOf(memberId); // 세션 ID는 사용자 ID로 설정
-
-        // Article 조회
-        Article article = articleRepository.findById(requestDto.articleId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid article ID"));
-
-        // 대화 내용 초기화 및 첫 질문 포함
-        List<Message> conversationHistory = new ArrayList<>();
-        String promptText = String.format("Category: %s\nContent: %s\nLevel: %d\nUser: %s",
-                article.getCategoryType(), article.getContent(), article.getLevel(), requestDto.initialAnswer());
-
-        // 첫 번째 GPT 응답 생성
-        String gptResponse = getGptResponse(promptText, conversationHistory);
-
-        // 첫 번째 질문과 응답 기록
-        UserMessage userMessage = new UserMessage(requestDto.initialAnswer());
-        conversationHistory.add(userMessage);
-        AssistantMessage aiMessage = new AssistantMessage(gptResponse);
-        conversationHistory.add(aiMessage);
-
-        // Redis에 저장
-        String conversationHistoryJson = objectMapper.writeValueAsString(conversationHistory);
-        redisUtils.setDataWithExpireTime(
-                RedisExpiredData.ofChatSession(sessionId, conversationHistoryJson, 1800L));
-
-        return chatMapper.toChatResponseDto(memberId, gptResponse);
-    }
-
-    /**
-     * 질문과 답변을 받아서 Redis에 이어 저장
-     */
-    public void addMessageToChatHistory(Long memberId, String question, String answer) throws JsonProcessingException {
-        String sessionId = String.valueOf(memberId);
-        // Redis에서 기존 대화 기록을 가져옴 (JSON 형식으로 역직렬화)
-        String conversationHistoryJson = (String) redisUtils.getData(sessionId);
-        List<Message> conversationHistory = objectMapper.readValue(conversationHistoryJson,
-                new TypeReference<List<Message>>() {
-                });
-
-        if (conversationHistory == null) {
-            throw new IllegalStateException("No chat history found for this session.");
-        }
-
-        // 사용자의 질문과 GPT의 응답을 추가
-        conversationHistory.add(new UserMessage(question));
-        conversationHistory.add(new AssistantMessage(answer));
-
-        // Redis에 다시 저장
-        redisUtils.setDataWithExpireTime(
-                RedisExpiredData.ofChatSession(sessionId, conversationHistory.toString(), 1800L));
-    }
-
-    /**
-     * GPT에게 이어지는 질문 요청 (아동 대상 친근한 질문)
-     */
-    public ChatResDto continueChat(ChatContinueReqDto requestDto, HttpServletRequest request)
-            throws JsonProcessingException {
-        String sessionId = getMemberIdFromToken(request).toString();
-
-        // 필수 정보 검증: answer
-        validateChatRequest(requestDto.answer(), "Answer is missing");
-
-        // Redis에서 대화 기록을 가져옴
-        String conversationHistoryJson = (String) redisUtils.getData(sessionId);
-        List<Message> conversationHistory = objectMapper.readValue(conversationHistoryJson,
-                new TypeReference<List<Message>>() {
-                });
-
-        if (conversationHistory == null) {
-            throw new IllegalStateException("No chat history found for this session.");
-        }
-
-        // GPT에게 대화 이어가기 요청
-        String gptResponse = getGptResponse(requestDto.answer(), conversationHistory);
-
-        // 응답을 대화 기록에 추가
-        AssistantMessage aiMessage = new AssistantMessage(gptResponse);
-        conversationHistory.add(aiMessage);
-
-        // Redis에 저장
-        String updatedConversationHistoryJson = objectMapper.writeValueAsString(conversationHistory);
-        redisUtils.setDataWithExpireTime(
-                RedisExpiredData.ofChatSession(sessionId, updatedConversationHistoryJson, 1800L));
-
-        return chatMapper.toChatResponseDto(Long.parseLong(sessionId), gptResponse);
-    }
-
-    /**
-     * 대화를 요약하는 메소드
-     */
-    public String summarizeConversation(Long memberId) throws JsonProcessingException {
-        List<Message> conversationHistory = getConversationHistory(memberId);
-
-        // GPT에게 대화 요약 요청
-        String summaryPrompt = "Summarize the conversation.";
-        String gptResponse = getGptResponse(summaryPrompt, conversationHistory);
-
-        // 요약된 내용을 반환
-        return gptResponse;
-    }
-
-    /**
-     * 사용자의 이해도를 평가하는 메소드
-     */
-    public Long evaluateUnderstanding(Long memberId) throws JsonProcessingException {
-        List<Message> conversationHistory = getConversationHistory(memberId);
-
-        // GPT에게 이해도 평가 요청
-        String evaluationPrompt = "Evaluate the user's understanding based on the conversation.";
-        String gptResponse = getGptResponse(evaluationPrompt, conversationHistory);
-
-        // GPT로부터 이해도를 받아 Long 타입으로 변환
-        Long understandingScore = parseUnderstandingScore(gptResponse);
-
-        return understandingScore;
-    }
-
-    /**
-     * Redis 데이터를 MariaDB에 저장
-     */
-    @Transactional
-    public Long evaluateUnderstandingAndEndChat(Long articleId, HttpServletRequest request)
-            throws JsonProcessingException {
-        Long memberId = getMemberIdFromToken(request);
-        List<Message> conversationHistory = getConversationHistory(memberId);
-
-        // Member 및 Article 조회
-        Member member = memberHelper.findMemberByIdOrThrow(memberId);
+    // 1. 질문과 답변 묶음을 List로 저장하는 메서드
+    private List<ConversationEntry> createConversationEntry(Long articleId, String answer) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid article ID"));
 
-        // 1. 대화 요약
-        String summary = summarizeConversation(memberId);
+        // 처음 질문을 담고, 그에 대한 유저의 답변을 담음
+        List<ConversationEntry> conversation = new ArrayList<>();
+        conversation.add(new ConversationEntry(article.getDefaultQuestion(), answer));
 
-        // 2. 이해도 평가
-        Long understandingScore = evaluateUnderstanding(memberId);
-
-        // 3. Reading 엔티티 저장
-        Reading reading = Reading.createReading(
-                member,
-                article,
-                System.currentTimeMillis(), // 실제 읽기 시간
-                summary, // 요약 내용
-                understandingScore.intValue()); // 이해도 점수
-        readingRepository.save(reading);
-
-        // ChatHistory 저장
-        saveChatHistory(reading, article, conversationHistory);
-
-        // Redis 데이터 삭제
-        deleteChatHistoryFromRedis(memberId);
-
-        // 8. 최종적으로 이해도 점수를 반환
-        return understandingScore;
+        return conversation;
     }
 
-    /**
-     * ChatHistory 저장을 분리한 메소드
-     */
-    private void saveChatHistory(Reading reading, Article article, List<Message> conversationHistory) {
-        for (Message message : conversationHistory) {
-            if (message instanceof UserMessage userMessage) {
-                // 팩토리 메소드로 UserMessage 저장
-                ChatHistory chatHistory = ChatHistory.createWithQuestion(reading, article, userMessage.getContent());
-                chatHistoryRepository.save(chatHistory);
-            } else if (message instanceof AssistantMessage assistantMessage) {
-                // 팩토리 메소드로 AssistantMessage 저장
-                ChatHistory chatHistory = ChatHistory.createWithAnswer(reading, article, assistantMessage.getContent());
-                chatHistoryRepository.save(chatHistory);
-            }
+    // 2. Redis에 질문과 답변 배열 형식으로 저장하는 메서드
+    private void saveToRedis(Long memberId, List<ConversationEntry> newEntries) throws JsonProcessingException {
+        // 기존 대화 기록을 Redis에서 가져옴
+        List<ConversationEntry> existingConversation = getChatFromRedisOrEmpty(memberId);
+
+        // 새로운 대화 항목을 기존 대화에 추가
+        existingConversation.addAll(newEntries);
+
+        // 누적된 대화를 Redis에 저장
+        String conversationJson = objectMapper.writeValueAsString(existingConversation);
+        redisUtils
+                .setDataWithExpireTime(RedisExpiredData.ofChatSession(memberId.toString(), conversationJson, 1800000L));
+    }
+
+    // Redis에서 대화 기록을 가져오거나 없으면 빈 리스트 반환
+    private List<ConversationEntry> getChatFromRedisOrEmpty(Long memberId) {
+        try {
+            return getChatFromRedis(memberId);
+        } catch (IllegalStateException | JsonProcessingException e) {
+            return new ArrayList<>(); // 대화 기록이 없을 경우 빈 리스트 반환
         }
     }
 
-    /**
-     * Redis 데이터 삭제
-     */
-    public void deleteChatHistoryFromRedis(Long memberId) {
-        String sessionId = String.valueOf(memberId);
-        redisUtils.deleteData(sessionId);
+    // 3. Redis 역직렬화해서 다시 String 타입으로 반환하는 메서드
+    private List<ConversationEntry> getChatFromRedis(Long memberId) throws JsonProcessingException {
+        String conversationHistoryJson = (String) redisUtils.getData("chat_session:" + memberId.toString());
+        if (conversationHistoryJson == null) {
+            throw new IllegalStateException("No conversation found for this session.");
+        }
+
+        // JSON 데이터를 로그로 출력하여 확인
+        log.info("conversationHistoryJson: {}", conversationHistoryJson);
+
+        // JSON 데이터를 List<ConversationEntry>로 역직렬화
+        return objectMapper.readValue(conversationHistoryJson, new TypeReference<List<ConversationEntry>>() {
+        });
     }
 
-    /**
-     * GPT에 질문을 던지고 응답을 받는 메소드
-     */
-    private String getGptResponse(String promptText, List<Message> conversationHistory) {
-        // GPT API 호출
-        Prompt prompt = new Prompt(conversationHistory); // 대화 기록을 사용하여 프롬프트 생성
+    // 4. GPT에게 이어지는 질문을 생성하도록 지시하는 메서드
+    private String generateNextQuestion(List<ConversationEntry> conversationHistory) {
+        // 기존 대화 내용을 Message 타입으로 변환
+        List<Message> messages = new ArrayList<>();
+        for (ConversationEntry entry : conversationHistory) {
+            if (entry.getQuestion() != null) {
+                messages.add(new UserMessage(entry.getQuestion())); // UserMessage를 추가
+            }
+            if (entry.getAnswer() != null) {
+                messages.add(new AssistantMessage(entry.getAnswer())); // AssistantMessage를 추가
+            }
+        }
+
+        // GPT에게 전달할 추가 메시지 생성
+        String promptText = "학생의 이전 응답을 바탕으로 이해도를 평가할 수 있는 신중한 질문을 생성해 주세요.";
+        messages.add(new UserMessage(promptText)); // UserMessage로 프롬프트 메시지 추가
+
+        // Prompt 생성 시 List<Message> 사용
+        Prompt prompt = new Prompt(messages);
+
+        // GPT 응답 처리
         ChatResponse response = chatModel.call(prompt);
-
-        // GPT 응답 반환
-        AssistantMessage aiMessage = response.getResults().get(0).getOutput();
-        return aiMessage.getContent();
+        return response.getResults().get(0).getOutput().getContent();
     }
 
-    /**
-     * GPT의 이해도 응답을 Long 타입으로 변환하는 메소드
-     */
-    private Long parseUnderstandingScore(String gptResponse) {
-        // GPT의 응답에서 이해도를 추출하는 로직 추가
-        // 예시로 숫자를 파싱하는 코드:
-        return Long.parseLong(gptResponse.replaceAll("[^0-9]", ""));
+    // 4. GPT에게 요약 요청
+    public String summarizeConversation(List<ConversationEntry> conversationEntries) {
+        String prompt = "다음 대화를 요약해 주세요.: " + conversationEntries.toString();
+        Prompt gptPrompt = new Prompt(new UserMessage(prompt));
+        ChatResponse response = chatModel.call(gptPrompt);
+        return response.getResults().get(0).getOutput().getContent();
+    }
+
+    // 5. GPT에게 이해도 평가 요청
+    public Long evaluateUnderstanding(List<ConversationEntry> conversationEntries, Article article) {
+        // 대화 내용과 아티클 내용을 프롬프트에 포함하여 GPT에 전달
+        StringBuilder promptBuilder = new StringBuilder();
+        promptBuilder
+                .append("다음 대화를 바탕으로 사용자가 해당 글을 얼마나 이해했는지 0에서 100까지의 숫자로 평가해 주세요.\n\n");
+
+        // 아티클 내용을 추가
+        promptBuilder.append("Article Content:\n");
+        promptBuilder.append(article.getContent()).append("\n\n");
+
+        // 사용자 대화 기록 추가
+        promptBuilder.append("Conversation:\n");
+        for (ConversationEntry entry : conversationEntries) {
+            promptBuilder.append("Question: ").append(entry.getQuestion()).append("\n");
+            promptBuilder.append("Answer: ").append(entry.getAnswer()).append("\n\n");
+        }
+
+        // GPT에게 이해도 평가 요청
+        String prompt = promptBuilder.toString();
+        Prompt gptPrompt = new Prompt(new UserMessage(prompt));
+        ChatResponse response = chatModel.call(gptPrompt);
+
+        // GPT 응답 처리
+        String gptResponse = response.getResults().get(0).getOutput().getContent();
+
+        // GPT 응답을 확인하고 숫자를 추출할 수 있는지 체크
+        log.info("GPT response: {}", gptResponse);
+
+        // GPT 응답에서 숫자를 추출하려고 시도
+        String numericPart = gptResponse.replaceAll("[^0-9]", ""); // 숫자만 남김
+
+        // 숫자가 없을 경우 기본값 반환
+        if (numericPart.isEmpty()) {
+            log.warn("GPT response did not contain a number, defaulting to 0.");
+            return 0L; // 기본값으로 0을 반환하거나 다른 처리 방법 선택
+        }
+
+        try {
+            // 이해도를 숫자로 변환하여 반환
+            return Long.parseLong(numericPart);
+        } catch (NumberFormatException e) {
+            log.error("Failed to parse GPT response to Long: {}", gptResponse, e);
+            return 0L; // 파싱 실패 시 기본값으로 0을 반환
+        }
+    }
+
+    // 6. 대화 종료 및 이해도 평가 메서드 추가
+    public String evaluateUnderstandingAndEndChat(Long articleId, HttpServletRequest request, Long readTime)
+            throws JsonProcessingException {
+        Long memberId = getMemberIdFromToken(request);
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid article ID"));
+        log.info("checkpoint1 :" + article);
+
+        // Redis에서 채팅 내역 가져오기
+        List<ConversationEntry> conversationEntries = getChatFromRedis(memberId);
+        log.info("checkpoint2 :" + conversationEntries);
+
+        // 1. 요약 생성
+        String summary = summarizeConversation(conversationEntries);
+        log.info("checkpoint3 :" + summary);
+
+        // 2. 이해도 평가
+        Long understandingScore = evaluateUnderstanding(conversationEntries, article);
+        log.info("checkpoint4 :" + understandingScore);
+
+        // 3. Redis 데이터 삭제
+        deleteChatFromRedis(memberId);
+        log.info("checkpoint5 : deleteChatFromRedis");
+
+        return summary; // 요약을 반환
+    }
+
+    // 7. processChat 메서드 - 컨트롤러에서 호출
+    public ChatResDto processChat(ChatReqDto requestDto, HttpServletRequest request) throws JsonProcessingException {
+        Long memberId = getMemberIdFromToken(request);
+
+        // Redis에서 대화 기록 가져오기 (없으면 빈 리스트 반환)
+        List<ConversationEntry> conversationHistory = getChatFromRedisOrEmpty(memberId);
+
+        // 새로운 대화를 추가 (이전 대화가 없으면 새로 시작)
+        if (conversationHistory.isEmpty()) {
+            conversationHistory = createConversationEntry(requestDto.articleId(), requestDto.answer());
+        } else {
+            // 기존 마지막 질문에 대한 답변 추가
+            ConversationEntry lastEntry = conversationHistory.get(conversationHistory.size() - 1);
+            lastEntry.setAnswer(requestDto.answer());
+        }
+
+        // 누적된 대화를 Redis에 저장
+        saveToRedis(memberId, conversationHistory);
+
+        // GPT에게 이어지는 질문 생성 요청
+        String gptQuestion = generateNextQuestion(conversationHistory);
+
+        // GPT 질문 반환 (저장하지 않음)
+        return chatMapper.toChatResponseDto(memberId, gptQuestion);
+    }
+
+    public void deleteChatFromRedis(Long memberId) {
+        redisUtils.deleteData("chat_session:" + memberId);
     }
 }

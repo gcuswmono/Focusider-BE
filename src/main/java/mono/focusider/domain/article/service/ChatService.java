@@ -122,7 +122,7 @@ public class ChatService {
         }
 
         // GPT에게 전달할 추가 메시지 생성
-        String promptText = "학생의 이전 응답을 바탕으로 이해도를 평가할 수 있는 신중한 질문을 생성해 주세요.";
+        String promptText = "학생의 이전 응답을 바탕으로 이해도를 평가할 수 있는 신중한 질문을 생성해 주세요. 단 한문장의 질문만 생성해주세요.";
         messages.add(new UserMessage(promptText)); // UserMessage로 프롬프트 메시지 추가
 
         // Prompt 생성 시 List<Message> 사용
@@ -134,8 +134,9 @@ public class ChatService {
     }
 
     // 4. GPT에게 요약 요청
-    public String summarizeConversation(List<ConversationEntry> conversationEntries) {
-        String prompt = "다음 대화를 요약해 주세요.: " + conversationEntries.toString();
+    public String summarizeConversation(List<ConversationEntry> conversationEntries, String content) {
+        String prompt = "다음 글이 내용과 대화를 요약해 주세요. \n 다음은 글이고 " + content + "다음은 이 글을 바탕으로 선생님과 학생의 채팅을 통한 학습 내역입니다."
+                + conversationEntries.toString();
         Prompt gptPrompt = new Prompt(new UserMessage(prompt));
         ChatResponse response = chatModel.call(gptPrompt);
         return response.getResults().get(0).getOutput().getContent();
@@ -146,7 +147,7 @@ public class ChatService {
         // 대화 내용과 아티클 내용을 프롬프트에 포함하여 GPT에 전달
         StringBuilder promptBuilder = new StringBuilder();
         promptBuilder
-                .append("다음 대화를 바탕으로 사용자가 해당 글을 얼마나 이해했는지 0에서 100까지의 숫자로 평가해 주세요.\n\n");
+                .append("다음 대화를 바탕으로 사용자가 해당 글을 얼마나 이해했는지 다른 설명없이 0에서 100까지의 숫자로 알려 주세요.\n\n");
 
         // 아티클 내용을 추가
         promptBuilder.append("Article Content:\n");
@@ -201,7 +202,7 @@ public class ChatService {
         List<ConversationEntry> conversationEntries = getChatFromRedis(memberId);
 
         // 1. 요약 생성
-        String summary = summarizeConversation(conversationEntries);
+        String summary = summarizeConversation(conversationEntries, article.getContent());
 
         // 2. 이해도 평가
         Long understandingScore = evaluateUnderstanding(conversationEntries, article);

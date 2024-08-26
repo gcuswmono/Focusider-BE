@@ -123,7 +123,7 @@ public class ChatService {
         }
 
         // GPT에게 전달할 추가 메시지 생성
-        String promptText = "학생의 이전 응답을 바탕으로 이해도를 평가할 수 있는 신중한 질문을 생성해 주세요. 단 한문장의 질문만 생성해주세요.";
+        String promptText = "학생의 응답을 기반으로 다음 질문을 만들어주세요.";
         messages.add(new UserMessage(promptText)); // UserMessage로 프롬프트 메시지 추가
 
         // Prompt 생성 시 List<Message> 사용
@@ -146,23 +146,13 @@ public class ChatService {
     // 5. GPT에게 이해도 평가 요청
     public Long evaluateUnderstanding(List<ConversationEntry> conversationEntries, Article article) {
         // 대화 내용과 아티클 내용을 프롬프트에 포함하여 GPT에 전달
-        StringBuilder promptBuilder = new StringBuilder();
-        promptBuilder
-                .append("다음 대화를 바탕으로 사용자가 해당 글을 얼마나 이해했는지 다른 설명없이 0에서 100까지의 숫자로 알려 주세요.\n\n");
-
-        // 아티클 내용을 추가
-        promptBuilder.append("Article Content:\n");
-        promptBuilder.append(article.getContent()).append("\n\n");
-
-        // 사용자 대화 기록 추가
-        promptBuilder.append("Conversation:\n");
+        StringBuilder compressedConversation = new StringBuilder();
         for (ConversationEntry entry : conversationEntries) {
-            promptBuilder.append("Question: ").append(entry.getQuestion()).append("\n");
-            promptBuilder.append("Answer: ").append(entry.getAnswer()).append("\n\n");
+            compressedConversation.append("Q: ").append(entry.getQuestion()).append(" A: ").append(entry.getAnswer())
+                    .append("\n");
         }
+        String prompt = "대화를 바탕으로 이해도를 평가해주세요: \n" + compressedConversation.toString();
 
-        // GPT에게 이해도 평가 요청
-        String prompt = promptBuilder.toString();
         Prompt gptPrompt = new Prompt(new UserMessage(prompt));
         ChatResponse response = chatModel.call(gptPrompt);
 

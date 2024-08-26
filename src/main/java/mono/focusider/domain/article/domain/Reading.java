@@ -28,7 +28,7 @@ public class Reading extends BaseTimeEntity {
     @Column(name = "reading_time")
     private Long readingTime;
 
-    @Column(name = "summary", nullable = false)
+    @Column(name = "summary", columnDefinition = "TEXT", nullable = false)
     @Builder.Default
     private String summary = "";
 

@@ -1,5 +1,9 @@
 package mono.focusider.domain.article.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.article.domain.Article;
@@ -13,28 +17,27 @@ import mono.focusider.domain.article.mapper.ChatMapper;
 import mono.focusider.domain.article.repository.ArticleRepository;
 import mono.focusider.domain.article.repository.ChatHistoryRepository;
 import mono.focusider.domain.article.repository.ReadingRepository;
+import mono.focusider.domain.attendance.domain.WeekInfo;
+import mono.focusider.domain.attendance.helper.WeekInfoHelper;
 import mono.focusider.domain.member.domain.Member;
 import mono.focusider.domain.member.repository.MemberRepository;
-import mono.focusider.global.utils.redis.RedisExpiredData;
-import mono.focusider.global.utils.redis.RedisUtils;
 import mono.focusider.global.security.JwtUtil;
 import mono.focusider.global.utils.cookie.CookieUtils;
-import org.springframework.ai.openai.OpenAiChatModel;
+import mono.focusider.global.utils.redis.RedisExpiredData;
+import mono.focusider.global.utils.redis.RedisUtils;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import jakarta.servlet.http.HttpServletRequest;
-
+import java.time.LocalDate;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +49,7 @@ public class ChatService {
     private final ReadingRepository readingRepository;
     private final MemberRepository memberRepository;
     private final ChatHistoryRepository chatHistoryRepository;
+    private final WeekInfoHelper weekInfoHelper;
     private final RedisUtils redisUtils;
     private final ChatMapper chatMapper;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -246,8 +250,8 @@ public class ChatService {
         // Reading 엔티티 생성
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
-
-        Reading reading = Reading.createReading(member, article, readTime, summary, understandingScore.intValue());
+        WeekInfo weekInfo = getWeekInfoWithNow();
+        Reading reading = Reading.createReading(member, article, readTime, summary, understandingScore.intValue(), weekInfo);
 
         // Reading 엔티티를 데이터베이스에 저장
         return readingRepository.save(reading); // 저장된 Reading 엔티티 반환
@@ -263,5 +267,14 @@ public class ChatService {
                 chatHistoryRepository.save(chatHistory); // ChatHistory 엔티티 저장
             }
         }
+    }
+
+    private WeekInfo getWeekInfoWithNow() {
+        LocalDate today = LocalDate.now();
+        int currentYear = today.getYear();
+        int currentMonth = today.getMonthValue();
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        int week = today.get(weekFields.weekOfMonth());
+        return weekInfoHelper.findWeekInfoWithYearAndMonthAndWeek(currentYear, currentMonth, week);
     }
 }

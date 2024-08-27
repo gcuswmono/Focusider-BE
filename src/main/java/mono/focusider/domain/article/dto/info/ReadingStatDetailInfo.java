@@ -5,6 +5,6 @@ import java.time.LocalDateTime;
 public record ReadingStatDetailInfo(
         LocalDateTime readingDate,
         Long readingTime,
-        Long understanding
+        Integer understanding
 ) {
 }

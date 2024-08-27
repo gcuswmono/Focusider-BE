@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.article.dto.req.ChatEndReqDto;
 import mono.focusider.domain.article.dto.req.ChatReqDto;
-import mono.focusider.domain.article.dto.req.ReadingStatReqDto;
 import mono.focusider.domain.article.dto.res.*;
 import mono.focusider.domain.article.service.ArticleService;
 import mono.focusider.domain.article.service.ChatService;
@@ -48,10 +47,10 @@ public class ArticleController {
             @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ReadingStatResDto.class))),
             @ApiResponse(responseCode = "500", description = "에러")
     })
-    @GetMapping("/stat")
+    @GetMapping("/stat/{weekInfoId}")
     public ResponseEntity<SuccessResponse<?>> getMemberStat(@MemberInfo MemberInfoParam memberInfoParam,
-                                                            @RequestBody ReadingStatReqDto reqDto) {
-        ReadingStatResDto result = articleService.findReadingMonthlyStat(memberInfoParam, reqDto);
+                                                            @PathVariable Long weekInfoId) {
+        ReadingStatResDto result = articleService.findReadingMonthlyStat(memberInfoParam, weekInfoId);
         return SuccessResponse.ok(result);
     }
 

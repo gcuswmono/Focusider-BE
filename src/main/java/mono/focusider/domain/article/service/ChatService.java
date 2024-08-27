@@ -155,7 +155,7 @@ public class ChatService {
             compressedConversation.append("Q: ").append(entry.getQuestion()).append(" A: ").append(entry.getAnswer())
                     .append("\n");
         }
-        String prompt = "대화를 바탕으로 이해도를 평가해주세요: \n" + compressedConversation.toString();
+        String prompt = "based on the lecture, tell me evaluated score of how much student understood from 0 to 100: \n" + compressedConversation.toString();
 
         Prompt gptPrompt = new Prompt(new UserMessage(prompt));
         ChatResponse response = chatModel.call(gptPrompt);

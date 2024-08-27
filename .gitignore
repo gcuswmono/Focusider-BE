@@ -39,3 +39,4 @@ out/
 build/
 /src/main/generated/
 src/main/resources/application-dev.yml
+.env

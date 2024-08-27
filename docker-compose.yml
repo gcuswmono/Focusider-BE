@@ -53,9 +53,6 @@ services:
       SPRING_DATASOURCE_PASSWORD: "focusider!"
     networks:
       - focusider-network
-    depends_on:
-      - mariadb
-      - redis
 
   nginx:
     image: nginx:latest

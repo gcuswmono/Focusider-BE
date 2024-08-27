@@ -27,13 +27,14 @@ public class SecurityConfig {
     private final AuthMapper authMapper;
     private final RedisUtils redisUtils;
 
-    private static final String[] whiteList = {"/api/auth/login", "/api/auth/signup", "/api/member/add", "/api/file", "/api/quiz/make" ,"/v3/**", "/swagger-ui/**"};
+    private static final String[] whiteList = { "/api/auth/login", "/api/auth/signup", "/api/member/add", "/api/file",
+            "/api/quiz/make", "/v3/**", "/swagger-ui/**", "/.well-known/acme-challenge/*" };
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring().requestMatchers(whiteList);
-//                .requestMatchers(HttpMethod.GET, whiteListGET)
-//                .requestMatchers(HttpMethod.PATCH, whiteListPatch);
+        // .requestMatchers(HttpMethod.GET, whiteListGET)
+        // .requestMatchers(HttpMethod.PATCH, whiteListPatch);
     }
 
     @Bean
@@ -43,14 +44,17 @@ public class SecurityConfig {
                 .formLogin((auth) -> auth.disable())
                 .httpBasic((auth) -> auth.disable())
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
-                        authorizationManagerRequestMatcherRegistry.anyRequest().authenticated())
-                .addFilterBefore(new JwtFilter(jwtUtil, authMapper, redisUtils), UsernamePasswordAuthenticationFilter.class);
+                .authorizeHttpRequests(
+                        authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
+                                .anyRequest().authenticated())
+                .addFilterBefore(new JwtFilter(jwtUtil, authMapper, redisUtils),
+                        UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 

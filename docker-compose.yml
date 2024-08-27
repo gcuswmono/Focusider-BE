@@ -1,0 +1,86 @@
+services:
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    restart: on-failure
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=focusider!
+      - MYSQL_DATABASE=focusider
+      - MYSQL_USER=focusider
+      - MYSQL_PASSWORD=focusider!
+      - TZ=Asia/Seoul
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      timeout: 40s
+      retries: 10
+    volumes:
+      - /home/ubuntu/db/conf.d:/etc/mysql/conf.d
+      - /home/ubuntu/db/data:/var/lib/mysql
+      - /home/ubuntu/db/initdb.d:/docker-entrypoint-initdb.d
+    networks:
+      - focusider-network
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    restart: always
+    volumes:
+      - /home/ubuntu/redis_data:/data
+    networks:
+      - focusider-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s # 30초마다 healthcheck 실행
+      timeout: 10s # 10초 내에 응답이 없으면 실패로 간주
+      retries: 5 # 5번 시도 후 실패로 간주
+      start_period: 5s # 컨테이너 시작 후 5초 뒤 healthcheck 시작
+
+  focusider:
+    container_name: focusider
+    ports:
+      - "8080:8080"
+    image: mango0422/focusider:latest
+    env_file:
+      - .env
+    networks:
+      - focusider-network
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /home/ubuntu/nginx.conf:/etc/nginx/nginx.conf
+      - /home/ubuntu/nginx/conf.d:/etc/nginx/conf.d
+      - /home/ubuntu/nginx/certbot/conf:/etc/letsencrypt
+      - /home/ubuntu/nginx/certbot/www:/var/www/certbot
+    networks:
+      - focusider-network
+    environment:
+      - NGINX_HOST=focusider.shop
+      - NGINX_PORT=80
+
+  focusider-fe:
+    image: mango0422/focusider-fe:latest
+    container_name: focusider-fe
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.prod
+    networks:
+      - focusider-network
+    restart: always
+
+networks:
+  focusider-network:
+    driver: bridge

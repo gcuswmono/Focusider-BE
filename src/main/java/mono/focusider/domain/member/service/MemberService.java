@@ -2,7 +2,6 @@ package mono.focusider.domain.member.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mono.focusider.domain.article.dto.info.ReadingStatInfo;
 import mono.focusider.domain.article.helper.ReadingHelper;
 import mono.focusider.domain.category.domain.Category;
 import mono.focusider.domain.category.helper.CategoryHelper;
@@ -13,9 +12,7 @@ import mono.focusider.domain.file.validate.FileValidate;
 import mono.focusider.domain.member.domain.Member;
 import mono.focusider.domain.member.dto.req.MemberCategorySaveReqDto;
 import mono.focusider.domain.member.dto.req.MemberInfoReqDto;
-import mono.focusider.domain.member.dto.req.MemberStatReqDto;
 import mono.focusider.domain.member.dto.req.MemberUpdateReqDto;
-import mono.focusider.domain.member.dto.res.MemberStatResDto;
 import mono.focusider.domain.member.helper.MemberHelper;
 import mono.focusider.domain.member.mapper.MemberMapper;
 import mono.focusider.domain.member.type.ReadingHardType;
@@ -75,12 +72,6 @@ public class MemberService {
         Member member = memberHelper.findMemberByIdOrThrow(memberInfoParam.memberId());
         member.deleteMemberSoft();
         redisUtils.setDataWithExpireTime(ofMemberHardDeleted(member.getId()));
-    }
-
-    public MemberStatResDto findMemberMonthlyStat(MemberInfoParam memberInfoParam, MemberStatReqDto memberStatReqDto) {
-        Long totalSolveTime = quizAttemptHelper.sumQuizSolveTime(memberInfoParam.memberId(), memberStatReqDto.statDate());
-        ReadingStatInfo readingStatInfo = readingHelper.sumReadingTime(memberInfoParam.memberId(), memberStatReqDto.statDate());
-        return memberMapper.toMemberStatResDto(totalSolveTime, readingStatInfo);
     }
 
     private Integer settingLevel(MemberCategorySaveReqDto memberCategorySaveReqDto) {

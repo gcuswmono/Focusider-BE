@@ -1,15 +1,10 @@
 package mono.focusider.domain.article.dto.info;
 
-import mono.focusider.domain.category.type.CategoryType;
-
-import java.time.LocalDateTime;
+import java.util.List;
 
 public record ReadingStatInfo(
-        Long readingId,
         String title,
-        CategoryType articleCategory,
-        Long readingTime,
-        Integer understanding,
-        LocalDateTime createdAt
+        List<ReadingStatDetailInfo> readingStatDetailInfos,
+        String summary
 ) {
 }

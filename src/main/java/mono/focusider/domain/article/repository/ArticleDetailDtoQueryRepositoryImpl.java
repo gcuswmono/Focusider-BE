@@ -12,7 +12,6 @@ import java.util.List;
 
 import static mono.focusider.domain.article.domain.QArticle.article;
 import static mono.focusider.domain.article.domain.QReading.reading;
-import static mono.focusider.domain.category.domain.QCategory.category;
 
 @RequiredArgsConstructor
 public class ArticleDetailDtoQueryRepositoryImpl implements ArticleDetailDtoQueryRepository {
@@ -32,6 +31,6 @@ public class ArticleDetailDtoQueryRepositoryImpl implements ArticleDetailDtoQuer
                                 .where(article.categoryType.in(categoryTypes).and(article.level.eq(member.getLevel()))
                                                 .and(reading.isNull().or(reading.member.id.ne(member.getId()))))
                                 .orderBy(Expressions.numberTemplate(Double.class, "RAND()").asc())
-                                .fetchOne();
+                                .fetchFirst();
         }
 }

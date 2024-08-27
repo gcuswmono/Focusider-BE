@@ -3,14 +3,15 @@ package mono.focusider.domain.article.repository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import mono.focusider.domain.article.dto.info.ReadingStatDetailInfo;
 import mono.focusider.domain.article.dto.info.ReadingStatInfo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.YearMonth;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import static mono.focusider.domain.article.domain.QArticle.article;
 import static mono.focusider.domain.article.domain.QReading.reading;
 
 @RequiredArgsConstructor
@@ -19,22 +20,36 @@ public class ReadingStatQueryRepositoryImpl implements ReadingStatQueryRepositor
 
     @Override
     public List<ReadingStatInfo> findReadingStatInfo(Long memberId, LocalDate statDate) {
-        YearMonth yearMonth = YearMonth.from(statDate);
-        LocalDateTime startDateTime = yearMonth.atDay(1).atStartOfDay();
-        LocalDateTime endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59, 999999999);
-        return queryFactory
-                .select(Projections.constructor(ReadingStatInfo.class,
-                        reading.id,
-                        article.title,
-                        article.categoryType,
+        List<ReadingStatDetailInfo> allReadings = queryFactory
+                .select(Projections.constructor(ReadingStatDetailInfo.class,
+                        reading.createdAt,
                         reading.readingTime,
-                        reading.understating,
-                        reading.createdAt
-                        )
-                )
+                        reading.understating
+                ))
                 .from(reading)
-                .leftJoin(reading.article, article)
-                .where(reading.member.id.eq(memberId).and(reading.createdAt.between(startDateTime, endDateTime)))
+                .where(
+                        reading.member.id.eq(memberId)
+                                .and(reading.createdAt.year().eq(statDate.getYear()))
+                                .and(reading.createdAt.month().eq(statDate.getMonthValue()))
+                )
                 .fetch();
+        Map<Integer, List<ReadingStatDetailInfo>> readingsByWeek = allReadings.stream()
+                .collect(Collectors.groupingBy(readingDetail -> getWeekOfMonth(readingDetail.readingDate())));
+        return readingsByWeek.entrySet().stream()
+                .map(entry -> {
+                    int week = entry.getKey();
+                    List<ReadingStatDetailInfo> details = entry.getValue();
+
+                    String title = week + "주차";
+                    String summary = "Summary for " + title;
+
+                    return new ReadingStatInfo(title, details, summary);
+                })
+                .collect(Collectors.toList());
+    }
+
+    private int getWeekOfMonth(LocalDateTime dateTime) {
+        int dayOfMonth = dateTime.getDayOfMonth();
+        return (dayOfMonth - 1) / 7 + 1;  // 1일~7일: 1주차, 8일~14일: 2주차, ...
     }
 }

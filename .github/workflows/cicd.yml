@@ -21,9 +21,10 @@ jobs:
           java-version: "21"
           distribution: "corretto"
 
-      - name: Create .env file
+      - name: Create .env file for Backend
         run: |
-          echo "${{ secrets.ENV_FILE }}" > .env
+          rm -rf /home/ubuntu/focusider/.env
+          echo "${{ secrets.ENV_FILE }}" > /home/ubuntu/focusider/.env
 
       - name: Build and Push Docker Image
         env:
@@ -38,6 +39,7 @@ jobs:
           DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
         run: |
           echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+          cd /home/ubuntu/focusider
           docker rm -f focusider
           docker rmi mango0422/focusider:latest || true
           docker compose pull focusider

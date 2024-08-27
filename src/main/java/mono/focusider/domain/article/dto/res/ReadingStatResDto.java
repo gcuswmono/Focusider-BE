@@ -9,8 +9,8 @@ import java.util.List;
 @Builder(access = AccessLevel.PRIVATE)
 public record ReadingStatResDto(
         String title,
+        String comment,
         List<ReadingStatDetailInfo> readingStatInfos
-        //String comment
 ) {
 
 }

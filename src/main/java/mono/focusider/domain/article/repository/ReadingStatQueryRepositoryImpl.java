@@ -9,6 +9,7 @@ import mono.focusider.domain.article.dto.res.ReadingStatResDto;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.list;
 import static mono.focusider.domain.article.domain.QReading.reading;
+import static mono.focusider.domain.attendance.domain.QComment.comment;
 import static mono.focusider.domain.attendance.domain.QWeekInfo.weekInfo;
 
 @RequiredArgsConstructor
@@ -20,11 +21,13 @@ public class ReadingStatQueryRepositoryImpl implements ReadingStatQueryRepositor
         return queryFactory
                 .from(reading)
                 .leftJoin(reading.weekInfo, weekInfo)
-                .where(reading.member.id.eq(memberId).and(weekInfo.id.eq(weekInfoId)))
+                .leftJoin(weekInfo.comments, comment)
+                .where(reading.member.id.eq(memberId).and(weekInfo.id.eq(weekInfoId).and(comment.member.id.eq(memberId))))
                 .transform(
                         groupBy(weekInfo.id).as(Projections.constructor(
                                 ReadingStatResDto.class,
                                 weekInfo.title,
+                                comment.content,
                                 list(Projections.constructor(ReadingStatDetailInfo.class,
                                         reading.createdAt,
                                         reading.readingTime,

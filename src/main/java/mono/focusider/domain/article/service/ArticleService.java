@@ -36,4 +36,5 @@ public class ArticleService {
     public ReadingStatResDto findReadingMonthlyStat(MemberInfoParam memberInfoParam, Long weekInfoId) {
         return readingHelper.findReadingStatInfo(memberInfoParam.memberId(), weekInfoId);
     }
+
 }

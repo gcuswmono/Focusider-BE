@@ -30,6 +30,10 @@ public class WeekInfo extends BaseTimeEntity {
     @Builder.Default
     private List<Reading> readings = new ArrayList<>();
 
+    @OneToMany(mappedBy = "weekInfo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Comment> comments = new ArrayList<>();
+
     public static WeekInfo of(String title, int year, int month, int week) {
         return WeekInfo
                 .builder()

@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.auth.dto.info.AuthUserInfo;
 import mono.focusider.domain.auth.mapper.AuthMapper;
-import mono.focusider.domain.member.type.MemberGenderType;
 import mono.focusider.domain.member.type.MemberRole;
 import mono.focusider.global.error.code.GlobalErrorCode;
 import mono.focusider.global.error.exception.ForbiddenException;
@@ -52,10 +51,10 @@ public class JwtFilter extends OncePerRequestFilter {
     private void checkCookieAndUpdateToken(HttpServletRequest request, HttpServletResponse response) {
         String authorization = CookieUtils.getCookieValueWithName(request, ACCESS_TOKEN.getName());
         if (!Objects.isNull(authorization))
-            updateAccessToken(authorization, response);
+            updateAccessToken(authorization, request, response);
     }
 
-    private void updateAccessToken(String authorization, HttpServletResponse response) {
+    private void updateAccessToken(String authorization, HttpServletRequest request, HttpServletResponse response) {
         try {
             AuthUserInfo authUserInfo = createAuthUserInfoDtoForToken(authorization);
             Authentication authentication = new UsernamePasswordAuthenticationToken(authUserInfo, null, authUserInfo.getAuthorities());
@@ -65,7 +64,7 @@ public class JwtFilter extends OncePerRequestFilter {
             String refreshToken = (String) redisUtils.getData(authorization);
             redisUtils.deleteData(authorization);
             log.info("refreshToken: {}", refreshToken);
-            validateRefreshToken(refreshToken);
+            validateRefreshToken(refreshToken, request, response);
             generateRefreshTokenWithAccessToken(refreshToken, response);
         }
     }
@@ -100,8 +99,10 @@ public class JwtFilter extends OncePerRequestFilter {
         log.info("엑세스 토큰 재발급 = {}", accessToken);
     }
 
-    private void validateRefreshToken(String refreshToken) {
-        if (Objects.isNull(refreshToken))
+    private void validateRefreshToken(String refreshToken, HttpServletRequest request, HttpServletResponse response) {
+        if (Objects.isNull(refreshToken)){
+            CookieUtils.getCookieValueWithNameAndKill(request, response, ACCESS_TOKEN.getName());
             throw new InvalidValueException(GlobalErrorCode.NOT_REFRESH_TOKEN);
+        }
     }
 }

@@ -3,38 +3,33 @@ package mono.focusider.domain.article.repository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import mono.focusider.domain.article.dto.info.ReadingStatInfo;
+import mono.focusider.domain.article.dto.info.ReadingStatDetailInfo;
+import mono.focusider.domain.article.dto.res.ReadingStatResDto;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.YearMonth;
-import java.util.List;
-
-import static mono.focusider.domain.article.domain.QArticle.article;
+import static com.querydsl.core.group.GroupBy.groupBy;
+import static com.querydsl.core.group.GroupBy.list;
 import static mono.focusider.domain.article.domain.QReading.reading;
+import static mono.focusider.domain.attendance.domain.QWeekInfo.weekInfo;
 
 @RequiredArgsConstructor
 public class ReadingStatQueryRepositoryImpl implements ReadingStatQueryRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<ReadingStatInfo> findReadingStatInfo(Long memberId, LocalDate statDate) {
-        YearMonth yearMonth = YearMonth.from(statDate);
-        LocalDateTime startDateTime = yearMonth.atDay(1).atStartOfDay();
-        LocalDateTime endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59, 999999999);
+    public ReadingStatResDto findReadingStatInfo(Long memberId, Long weekInfoId) {
         return queryFactory
-                .select(Projections.constructor(ReadingStatInfo.class,
-                        reading.id,
-                        article.title,
-                        article.categoryType,
-                        reading.readingTime,
-                        reading.understating,
-                        reading.createdAt
-                        )
-                )
                 .from(reading)
-                .leftJoin(reading.article, article)
-                .where(reading.member.id.eq(memberId).and(reading.createdAt.between(startDateTime, endDateTime)))
-                .fetch();
+                .leftJoin(reading.weekInfo, weekInfo)
+                .where(reading.member.id.eq(memberId).and(weekInfo.id.eq(weekInfoId)))
+                .transform(
+                        groupBy(weekInfo.id).as(Projections.constructor(
+                                ReadingStatResDto.class,
+                                weekInfo.title,
+                                list(Projections.constructor(ReadingStatDetailInfo.class,
+                                        reading.createdAt,
+                                        reading.readingTime,
+                                        reading.understating))
+                        ))
+                ).values().stream().findFirst().orElse(null);
     }
 }

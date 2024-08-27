@@ -1,8 +1,6 @@
 package mono.focusider.domain.article.service;
 
 import lombok.RequiredArgsConstructor;
-import mono.focusider.domain.article.dto.info.ReadingStatInfo;
-import mono.focusider.domain.article.dto.req.ReadingStatReqDto;
 import mono.focusider.domain.article.dto.res.ArticleDetailResDto;
 import mono.focusider.domain.article.dto.res.ReadingStatResDto;
 import mono.focusider.domain.article.helper.ArticleHelper;
@@ -37,8 +35,7 @@ public class ArticleService {
         return articleHelper.findArticleDetailRandWithMember(member, memberCategoryTypes);
     }
 
-    public ReadingStatResDto findReadingMonthlyStat(MemberInfoParam memberInfoParam, ReadingStatReqDto reqDto) {
-        List<ReadingStatInfo> readingStatInfo = readingHelper.findReadingStatInfo(memberInfoParam.memberId(), reqDto.statDate());
-        return readingMapper.toReadingStatDto(readingStatInfo);
+    public ReadingStatResDto findReadingMonthlyStat(MemberInfoParam memberInfoParam, Long weekInfoId) {
+        return readingHelper.findReadingStatInfo(memberInfoParam.memberId(), weekInfoId);
     }
 }

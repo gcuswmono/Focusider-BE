@@ -1,0 +1,89 @@
+spring:
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://3.38.179.245:3306/focusider?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    username: focusider
+    password: "focusider!"
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 1GB
+
+  jackson:
+    time-zone: Asia/Seoul
+
+  data:
+    web:
+      pageable:
+        default-page-size: 5
+        one-indexed-parameters: true
+    redis:
+      host: 3.38.179.245
+      port: 6379
+      password:
+    rest:
+      detection-strategy: annotated
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        #show_sql: true
+        format_sql: true
+        default_batch_fetch_size: 1000
+
+  jwt:
+    secret: 035181ea40e854b3a37b714bcf6c99f0df16e3040c3f65be4a0123032e00ee75fef03f85461cf71db7f535ae1cffbc248186b2e6f1e55b63dc5255183015bda6
+    expireAccessToken: 1800000
+    expireRefreshToken: 604800000
+  ai:
+    openai:
+      api-key: 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 # Replace with your actual OpenAI API key
+      chat:
+        options:
+          model: gpt-4o-mini # The OpenAI model to use (e.g., gpt-3.5-turbo or gpt-4)
+          temperature: 0.7 # Adjust the temperature for response creativity (0.0 - 1.0)
+          max-tokens: 1000 # Set the maximum number of tokens to generate in a response
+          top-p: 1.0 # Controls diversity via nucleus sampling
+          n: 1 # Number of responses to return
+          stop: null # Specify stop sequences for responses (optional)
+          presence-penalty: 0.0 # Penalize new topics in generation (0.0 for no penalty)
+          frequency-penalty: 0.0 # Penalize repeated phrases in generation (0.0 for no penalty)
+
+cloud:
+  aws:
+    s3:
+      bucket: focusider
+      upload-path: https://focusider.s3.ap-northeast-2.amazonaws.com
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+    credentials:
+      access-key: AKIA6GBMDCUSRF7LIVER
+      secret-key: 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
+
+logging.level:
+  org.hibernate.SQL: DEBUG
+  org.hibernate.type: trace
+
+openapi:
+  service:
+    url: localhost:8080
+
+springdoc:
+  version: 0.0.1
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    operations-sorter: alpha
+    path: /swagger-ui.html

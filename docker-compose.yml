@@ -76,7 +76,7 @@ services:
 
   focusider-fe:
     image: mango0422/focusider-fe:latest
-    container_name: my-app
+    container_name: focusider-fe
     ports:
       - "3000:3000"
     environment:

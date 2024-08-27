@@ -9,6 +9,8 @@ import mono.focusider.global.error.exception.EntityNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Component
 @Transactional(readOnly = true)
@@ -42,5 +44,9 @@ public class MemberHelper {
 
     public void deleteMemberHard(Member member) {
         memberRepository.delete(member);
+    }
+
+    public List<Member> findAllMember() {
+        return memberRepository.findAll();
     }
 }

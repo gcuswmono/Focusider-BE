@@ -29,4 +29,9 @@ public class WeekInfoHelper {
     public List<WeekInfoInfo> findWeekInfos(Long memberId, LocalDate localDate) {
         return weekInfoRepository.findWeekInfoInfoWithDate(memberId, localDate);
     }
+
+    public WeekInfo findPreviousWeekInfo(LocalDate nowDate) {
+        return weekInfoRepository.findPreviousWeekInfo(nowDate)
+                .orElseThrow(() -> new EntityNotFoundException(WEEK_INFO_NOT_FOUND));
+    }
 }

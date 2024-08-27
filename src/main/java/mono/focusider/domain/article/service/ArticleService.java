@@ -1,8 +1,13 @@
 package mono.focusider.domain.article.service;
 
 import lombok.RequiredArgsConstructor;
+import mono.focusider.domain.article.dto.info.ReadingStatInfo;
+import mono.focusider.domain.article.dto.req.ReadingStatReqDto;
 import mono.focusider.domain.article.dto.res.ArticleDetailResDto;
+import mono.focusider.domain.article.dto.res.ReadingStatResDto;
 import mono.focusider.domain.article.helper.ArticleHelper;
+import mono.focusider.domain.article.helper.ReadingHelper;
+import mono.focusider.domain.article.mapper.ReadingMapper;
 import mono.focusider.domain.category.domain.Category;
 import mono.focusider.domain.category.domain.MemberCategory;
 import mono.focusider.domain.category.type.CategoryType;
@@ -20,6 +25,8 @@ import java.util.List;
 public class ArticleService {
     private final ArticleHelper articleHelper;
     private final MemberHelper memberHelper;
+    private final ReadingHelper readingHelper;
+    private final ReadingMapper readingMapper;
 
     public ArticleDetailResDto findArticleDetail(MemberInfoParam memberInfoParam) {
         Member member = memberHelper.findMemberByIdWithCategoriesOrThrow(memberInfoParam.memberId());
@@ -28,5 +35,10 @@ public class ArticleService {
                 .map(Category::getCategoryType)
                 .toList();
         return articleHelper.findArticleDetailRandWithMember(member, memberCategoryTypes);
+    }
+
+    public ReadingStatResDto findReadingMonthlyStat(MemberInfoParam memberInfoParam, ReadingStatReqDto reqDto) {
+        List<ReadingStatInfo> readingStatInfo = readingHelper.findReadingStatInfo(memberInfoParam.memberId(), reqDto.statDate());
+        return readingMapper.toReadingStatDto(readingStatInfo);
     }
 }

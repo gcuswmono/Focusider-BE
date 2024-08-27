@@ -6,13 +6,14 @@ import mono.focusider.domain.article.repository.ReadingRepository;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class ReadingHelper {
     private final ReadingRepository readingRepository;
 
-    public ReadingStatInfo sumReadingTime(Long memberId, LocalDate statDate) {
-        return readingRepository.sumReadingTime(memberId, statDate);
+    public List<ReadingStatInfo> findReadingStatInfo(Long memberId, LocalDate statDate) {
+        return readingRepository.findReadingStatInfo(memberId, statDate);
     }
 }

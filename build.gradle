@@ -1,0 +1,139 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.1'
+    id 'io.spring.dependency-management' version '1.1.5'
+    id 'com.google.cloud.tools.jib' version '3.4.3'
+}
+
+ext {
+    springAiVersion = "1.0.0-M1"
+}
+
+bootRun {
+    // spring.profiles.active가 설정되었으면 그 값을 사용하고, 설정되지 않았으면 'dev' 사용
+    systemProperty 'spring.profiles.active', System.getProperty('spring.profiles.active') ?: 'dev'
+}
+
+task copyYml(type: Copy) {
+    // spring.profiles.active가 설정되었으면 그 값을 사용하고, 설정되지 않았으면 'dev' 사용
+    from("src/main/resources/application-${System.getProperty('spring.profiles.active') ?: 'dev'}.yml")
+    into("build/resources/main")
+    rename { fileName ->
+        'application.yml'
+    }
+}
+
+
+group = 'mono.focusider'
+version = '0.0.1-SNAPSHOT'
+
+jib {
+   from {
+       image = 'eclipse-temurin:21-jre'
+   }
+   to {
+       image = 'docker.io/mango0422/focusider'
+       tags = [project.findProperty('jib.to.tags') ?: 'latest']
+       auth {
+           username = System.getenv('DOCKERHUB_USERNAME') ?: 'dummy-username'
+           password = System.getenv('DOCKERHUB_ACCESS_TOKEN')  ?: 'dummy-accesstoken'
+       }
+   }
+   container {
+       ports = ['8080']
+       jvmFlags = ['-Xms512m', '-Xmx512m', '-Dspring.profiles.active=prod']
+       environment = [SPRING_OUTPUT_ANSI_ENABLED: "ALWAYS"]
+       labels = [Iversion: project.version, name: project.name, group: project.group]
+       format = 'Docker'
+   }
+}
+
+
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
+    maven { url 'https://repo.spring.io/snapshot' }
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation "org.springframework.ai:spring-ai-openai-spring-boot-starter"
+    implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT")
+    implementation 'org.springframework.ai:spring-ai-openai'
+
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    //JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+    annotationProcessor 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // querydsl
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+    // aws
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.1.RELEASE'
+
+    //batch
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation 'org.springframework.boot:spring-boot-starter-quartz'
+    testImplementation 'org.springframework.batch:spring-batch-test'
+
+    // shedlock
+    implementation 'net.javacrumbs.shedlock:shedlock-spring:4.29.0'
+    implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.29.0'
+    implementation 'net.javacrumbs.shedlock:shedlock-core:4.37.0'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.ai:spring-ai-bom:$springAiVersion"
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+
+// Querydsl 설정부
+def generated = 'src/main/generated'
+
+// querydsl QClass 파일 생성 위치를 지정
+tasks.withType(JavaCompile) {
+    options.getGeneratedSourceOutputDirectory().set(file(generated))
+}
+
+// java source set 에 querydsl QClass 위치 추가
+sourceSets {
+    main.java.srcDirs += [generated]
+}
+
+clean {
+    delete file('src/main/generated')
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

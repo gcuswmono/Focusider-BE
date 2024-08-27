@@ -28,7 +28,6 @@ public class CommentBatch {
     private final CommentValidate commentValidate;
 
     @Scheduled(cron = "0 0 0 * * MON")
-    //@Scheduled(fixedDelay = 5000)
     public void batch() {
         LocalDate today = LocalDate.now();
         WeekInfo weekInfo = weekInfoHelper.findPreviousWeekInfo(today);

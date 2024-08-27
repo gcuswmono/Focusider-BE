@@ -9,11 +9,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.article.dto.res.ArticleDetailResDto;
 import mono.focusider.domain.article.service.ArticleService;
+import mono.focusider.domain.article.dto.req.ReadingStatReqDto;
+import mono.focusider.domain.article.dto.res.ReadingStatResDto;
 import mono.focusider.global.annotation.MemberInfo;
 import mono.focusider.global.aspect.member.MemberInfoParam;
 import mono.focusider.global.domain.SuccessResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,6 +35,17 @@ public class ArticleController {
     @GetMapping
     public ResponseEntity<SuccessResponse<?>> findArticleRandom(@MemberInfo MemberInfoParam memberInfoParam) {
         ArticleDetailResDto result = articleService.findArticleDetail(memberInfoParam);
+        return SuccessResponse.ok(result);
+    }
+
+    @Operation(summary = "통계", description = "읽은 아티클 리스트", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ReadingStatResDto.class))),
+            @ApiResponse(responseCode = "500", description = "에러")
+    })
+    @GetMapping("/stat")
+    public ResponseEntity<SuccessResponse<?>> getMemberStat(@MemberInfo MemberInfoParam memberInfoParam,
+                                                            @RequestBody ReadingStatReqDto reqDto) {
+        ReadingStatResDto result = articleService.findReadingMonthlyStat(memberInfoParam, reqDto);
         return SuccessResponse.ok(result);
     }
 }

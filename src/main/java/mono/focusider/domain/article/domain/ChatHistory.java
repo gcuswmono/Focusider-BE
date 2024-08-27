@@ -12,7 +12,7 @@ import mono.focusider.global.domain.BaseTimeEntity;
 public class ChatHistory extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "chat_history_id")
+    @Column(name = "chathistory_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

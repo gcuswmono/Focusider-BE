@@ -1,10 +1,7 @@
 package mono.focusider.domain.article.repository;
 
-import mono.focusider.domain.article.dto.info.ReadingStatInfo;
-
-import java.time.LocalDate;
-import java.util.List;
+import mono.focusider.domain.article.dto.res.ReadingStatResDto;
 
 public interface ReadingStatQueryRepository {
-    List<ReadingStatInfo> findReadingStatInfo(Long memberId, LocalDate statDate);
+    ReadingStatResDto findReadingStatInfo(Long memberId, Long weekInfoId);
 }

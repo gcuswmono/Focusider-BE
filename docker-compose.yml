@@ -35,6 +35,12 @@ services:
       - /home/ubuntu/redis_data:/data
     networks:
       - focusider-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s # 30초마다 healthcheck 실행
+      timeout: 10s # 10초 내에 응답이 없으면 실패로 간주
+      retries: 5 # 5번 시도 후 실패로 간주
+      start_period: 5s # 컨테이너 시작 후 5초 뒤 healthcheck 시작
 
   focusider:
     container_name: focusider

@@ -38,6 +38,19 @@ spring:
     secret: 035181ea40e854b3a37b714bcf6c99f0df16e3040c3f65be4a0123032e00ee75fef03f85461cf71db7f535ae1cffbc248186b2e6f1e55b63dc5255183015bda6
     expireAccessToken: 1800000
     expireRefreshToken: 604800000
+  ai:
+    openai:
+      api-key: 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 # Replace with your actual OpenAI API key
+      chat:
+        options:
+          model: gpt-4o-mini # The OpenAI model to use (e.g., gpt-3.5-turbo or gpt-4)
+          temperature: 0.7 # Adjust the temperature for response creativity (0.0 - 1.0)
+          max-tokens: 1000 # Set the maximum number of tokens to generate in a response
+          top-p: 1.0 # Controls diversity via nucleus sampling
+          n: 1 # Number of responses to return
+          stop: null # Specify stop sequences for responses (optional)
+          presence-penalty: 0.0 # Penalize new topics in generation (0.0 for no penalty)
+          frequency-penalty: 0.0 # Penalize repeated phrases in generation (0.0 for no penalty)
 
 cloud:
   aws:

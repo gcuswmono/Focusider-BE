@@ -25,6 +25,24 @@ public class SuccessResponse<T> {
                 .body(SuccessResponse.of(SuccessCode.CREATED, data));
     }
 
+    public static <T> ResponseEntity<SuccessResponse<?>> error(String errorMessage) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(SuccessResponse.builder()
+                        .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                        .message(errorMessage)
+                        .data(null) // No data in case of an error
+                        .build());
+    }
+
+    // 400 Bad Request response
+    public static <T> ResponseEntity<SuccessResponse<?>> badRequest(String errorMessage) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(SuccessResponse.builder()
+                        .status(HttpStatus.BAD_REQUEST.value())
+                        .message(errorMessage)
+                        .data(null)
+                        .build());
+    }
 
     public static <T> SuccessResponse<?> of(SuccessCode successCode, T data) {
         return SuccessResponse.builder()

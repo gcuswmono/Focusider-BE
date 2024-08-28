@@ -28,7 +28,8 @@ public class ArticleDetailDtoQueryRepositoryImpl implements ArticleDetailDtoQuer
                                                 article.categoryType))
                                 .from(article)
                                 .leftJoin(article.reading, reading)
-                                .where(article.categoryType.in(categoryTypes).and(article.level.eq(member.getLevel()))
+                                .where(article.categoryType.in(categoryTypes)
+                                        .and(article.level.between(member.getLevel() - 1, member.getLevel() + 1))
                                                 .and(reading.isNull().or(reading.member.id.ne(member.getId()))))
                                 .orderBy(Expressions.numberTemplate(Double.class, "RAND()").asc())
                                 .fetchFirst();

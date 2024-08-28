@@ -135,6 +135,9 @@ $ cd Focusider-BE
 
 </br>
 
+### 3. ERD
+<img src="image/erd.png" alt="cicd" />
+
 
 ### 패키지 구조
 

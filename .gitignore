@@ -38,5 +38,6 @@ out/
 .gradle/
 build/
 /src/main/generated/
+src/main/resources/application-dev.yml
 .env
 backup.sql

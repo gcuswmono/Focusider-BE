@@ -13,7 +13,7 @@ public class AuthHelper {
 
     private final MemberRepository memberRepository;
 
-    public void createMemberAndSave(SignupReqDto signupReqDto, File profileImageFile, String password) {
-        memberRepository.save(Member.createMember(signupReqDto, profileImageFile, password));
+    public Member createMemberAndSave(SignupReqDto signupReqDto, File profileImageFile, String password) {
+        return memberRepository.save(Member.createMember(signupReqDto, profileImageFile, password));
     }
 }

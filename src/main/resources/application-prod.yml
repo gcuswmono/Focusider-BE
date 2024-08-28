@@ -1,9 +1,11 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://mariadb:3306/focusider
-    username: focusider
-    password: "focusider!"
+    url: ${MARIADB_URL}
+    username: ${MARIADB_USERNAME}
+    password: ${MARIADB_PASSWORD}
 
   servlet:
     multipart:
@@ -21,7 +23,7 @@ spring:
     redis:
       host: redis
       port: 6379
-      password: focusider!
+      password:
     rest:
       detection-strategy: annotated
 
@@ -35,12 +37,12 @@ spring:
         default_batch_fetch_size: 1000
 
   jwt:
-    secret: 035181ea40e854b3a37b714bcf6c99f0df16e3040c3f65be4a0123032e00ee75fef03f85461cf71db7f535ae1cffbc248186b2e6f1e55b63dc5255183015bda6
+    secret: ${JWT_SECRET}
     expireAccessToken: 1800000
     expireRefreshToken: 604800000
   ai:
     openai:
-      api-key: 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 # Replace with your actual OpenAI API key
+      api-key: ${OPENAI_KEY} # Replace with your actual OpenAI API key
       chat:
         options:
           model: gpt-4o-mini # The OpenAI model to use (e.g., gpt-3.5-turbo or gpt-4)
@@ -56,15 +58,15 @@ cloud:
   aws:
     s3:
       bucket: focusider
-      upload-path: https://focusider.s3.ap-northeast-2.amazonaws.com
+      upload-path: ${S3_URL}
     region:
       static: ap-northeast-2
       auto: false
     stack:
       auto: false
     credentials:
-      access-key: AKIA6GBMDCUSRF7LIVER
-      secret-key: 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
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}
 
 logging.level:
   org.hibernate.SQL: DEBUG

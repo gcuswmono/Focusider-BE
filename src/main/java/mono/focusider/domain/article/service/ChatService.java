@@ -1,5 +1,9 @@
 package mono.focusider.domain.article.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mono.focusider.domain.article.domain.Article;
@@ -13,28 +17,27 @@ import mono.focusider.domain.article.mapper.ChatMapper;
 import mono.focusider.domain.article.repository.ArticleRepository;
 import mono.focusider.domain.article.repository.ChatHistoryRepository;
 import mono.focusider.domain.article.repository.ReadingRepository;
+import mono.focusider.domain.attendance.domain.WeekInfo;
+import mono.focusider.domain.attendance.helper.WeekInfoHelper;
 import mono.focusider.domain.member.domain.Member;
 import mono.focusider.domain.member.repository.MemberRepository;
-import mono.focusider.global.utils.redis.RedisExpiredData;
-import mono.focusider.global.utils.redis.RedisUtils;
 import mono.focusider.global.security.JwtUtil;
 import mono.focusider.global.utils.cookie.CookieUtils;
-import org.springframework.ai.openai.OpenAiChatModel;
+import mono.focusider.global.utils.redis.RedisExpiredData;
+import mono.focusider.global.utils.redis.RedisUtils;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import jakarta.servlet.http.HttpServletRequest;
-
+import java.time.LocalDate;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +49,7 @@ public class ChatService {
     private final ReadingRepository readingRepository;
     private final MemberRepository memberRepository;
     private final ChatHistoryRepository chatHistoryRepository;
+    private final WeekInfoHelper weekInfoHelper;
     private final RedisUtils redisUtils;
     private final ChatMapper chatMapper;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -123,7 +127,7 @@ public class ChatService {
         }
 
         // GPT에게 전달할 추가 메시지 생성
-        String promptText = "위와 같은 선생과 학생의 문답을 바탕으로 이해도를 평가할 수 있는 선생님의 질문을 생성해 주세요. 단 한문장의 질문만 생성해주세요.";
+        String promptText = "당신은 친절한 선생님입니다. 학생의 응답을 기반으로 다음 질문을 기호나 설명없이 만들어주세요. 만약 잘 모르겠다고 하면 그에 대한 설명을 하고 다음 질문을 생성해주세요.";
         messages.add(new UserMessage(promptText)); // UserMessage로 프롬프트 메시지 추가
 
         // Prompt 생성 시 List<Message> 사용
@@ -136,7 +140,8 @@ public class ChatService {
 
     // 4. GPT에게 요약 요청
     public String summarizeConversation(List<ConversationEntry> conversationEntries, String content) {
-        String prompt = "다음 글이 내용과 대화를 요약해 주세요. \n 다음은 글이고 " + content + "다음은 이 글을 바탕으로 선생님과 학생의 채팅을 통한 학습 내역입니다."
+        String prompt = "다음 글이 내용과 대화를 요약해 주세요. \n 다음은 글이고 " + content
+                + "다음은 이 글을 바탕으로 선생님과 학생의 채팅을 통한 학습 내역입니다."
                 + conversationEntries.toString();
         Prompt gptPrompt = new Prompt(new UserMessage(prompt));
         ChatResponse response = chatModel.call(gptPrompt);
@@ -146,23 +151,14 @@ public class ChatService {
     // 5. GPT에게 이해도 평가 요청
     public Long evaluateUnderstanding(List<ConversationEntry> conversationEntries, Article article) {
         // 대화 내용과 아티클 내용을 프롬프트에 포함하여 GPT에 전달
-        StringBuilder promptBuilder = new StringBuilder();
-        promptBuilder
-                .append("다음 대화를 바탕으로 사용자가 해당 글을 얼마나 이해했는지 다른 설명없이 0에서 100까지의 숫자로 알려 주세요.\n\n");
-
-        // 아티클 내용을 추가
-        promptBuilder.append("Article Content:\n");
-        promptBuilder.append(article.getContent()).append("\n\n");
-
-        // 사용자 대화 기록 추가
-        promptBuilder.append("Conversation:\n");
+        StringBuilder compressedConversation = new StringBuilder();
         for (ConversationEntry entry : conversationEntries) {
-            promptBuilder.append("Question: ").append(entry.getQuestion()).append("\n");
-            promptBuilder.append("Answer: ").append(entry.getAnswer()).append("\n\n");
+            compressedConversation.append("Q: ").append(entry.getQuestion()).append(" A: ").append(entry.getAnswer())
+                    .append("\n");
         }
+        String prompt = "based on the lecture, tell me evaluated score of how much student understood from 0 to 100: \n"
+                + compressedConversation.toString();
 
-        // GPT에게 이해도 평가 요청
-        String prompt = promptBuilder.toString();
         Prompt gptPrompt = new Prompt(new UserMessage(prompt));
         ChatResponse response = chatModel.call(gptPrompt);
 
@@ -256,8 +252,9 @@ public class ChatService {
         // Reading 엔티티 생성
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
-
-        Reading reading = Reading.createReading(member, article, readTime, summary, understandingScore.intValue());
+        WeekInfo weekInfo = getWeekInfoWithNow();
+        Reading reading = Reading.createReading(member, article, readTime, summary, understandingScore.intValue(),
+                weekInfo);
 
         // Reading 엔티티를 데이터베이스에 저장
         return readingRepository.save(reading); // 저장된 Reading 엔티티 반환
@@ -273,5 +270,14 @@ public class ChatService {
                 chatHistoryRepository.save(chatHistory); // ChatHistory 엔티티 저장
             }
         }
+    }
+
+    private WeekInfo getWeekInfoWithNow() {
+        LocalDate today = LocalDate.now();
+        int currentYear = today.getYear();
+        int currentMonth = today.getMonthValue();
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        int week = today.get(weekFields.weekOfMonth());
+        return weekInfoHelper.findWeekInfoWithYearAndMonthAndWeek(currentYear, currentMonth, week);
     }
 }

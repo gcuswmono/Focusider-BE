@@ -29,7 +29,7 @@ version = '0.0.1-SNAPSHOT'
 
 jib {
    from {
-       image = 'amazoncorretto:21-alpine3.18-jdk'
+       image = 'eclipse-temurin:21-jre'
    }
    to {
        image = 'docker.io/mango0422/focusider'

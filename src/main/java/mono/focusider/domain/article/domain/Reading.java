@@ -2,6 +2,7 @@ package mono.focusider.domain.article.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import mono.focusider.domain.attendance.domain.WeekInfo;
 import mono.focusider.domain.member.domain.Member;
 import mono.focusider.global.domain.BaseTimeEntity;
 
@@ -28,7 +29,7 @@ public class Reading extends BaseTimeEntity {
     @Column(name = "reading_time")
     private Long readingTime;
 
-    @Column(name = "summary", nullable = false)
+    @Column(name = "summary", columnDefinition = "TEXT", nullable = false)
     @Builder.Default
     private String summary = "";
 
@@ -36,14 +37,19 @@ public class Reading extends BaseTimeEntity {
     @Builder.Default
     private Integer understating = 0;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "week_info_id")
+    private WeekInfo weekInfo;
+
     public static Reading createReading(Member member, Article article, Long readingTime, String summary,
-            Integer understandingScore) {
+            Integer understandingScore, WeekInfo weekInfo) {
         return Reading.builder()
                 .member(member)
                 .article(article)
                 .readingTime(readingTime)
                 .summary(summary)
                 .understating(understandingScore)
+                .weekInfo(weekInfo)
                 .build();
     }
 }

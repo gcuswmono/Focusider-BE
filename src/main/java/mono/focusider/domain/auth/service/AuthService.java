@@ -42,22 +42,21 @@ public class AuthService {
     private final RedisUtils redisUtils;
 
     @Transactional
-    public void signup(SignupReqDto signupReqDto) {
+    public void signup(SignupReqDto signupReqDto, HttpServletResponse response) {
         authValidator.checkAccountId(signupReqDto.accountId());
         String password = passwordEncoder.encode(signupReqDto.password());
         File profileImageFile = fileHelper.findFileByUrlOrNull(signupReqDto.profileImage());
-        authHelper.createMemberAndSave(signupReqDto, profileImageFile, password);
+        Member member = authHelper.createMemberAndSave(signupReqDto, profileImageFile, password);
         fileValidate.validateFileAndUpdateUsed(profileImageFile);
+        AuthUserInfo authUserInfo = AuthUserInfo.of(member);
+        setJwtToken(authUserInfo, response);
     }
 
     public void login(LoginReqDto loginReqDto, HttpServletResponse response) {
         Member member = memberHelper.findMemberByAccountIdOrThrow(loginReqDto.accountId());
         authValidator.validatePassword(loginReqDto.password(), member.getPassword(), passwordEncoder);
         AuthUserInfo authUserInfo = AuthUserInfo.of(member);
-        String accessToken = jwtUtil.createAccessToken(authUserInfo);
-        String refreshToken = jwtUtil.createRefreshToken(authUserInfo);
-        jwtUtil.addRedisTokenInfo(refreshToken, accessToken);
-        jwtUtil.addAccessTokenToCookie(response, accessToken);
+        setJwtToken(authUserInfo, response);
     }
 
     public CheckDuplicatedResDto checkDuplicated(CheckDuplicatedReqDto checkDuplicatedReqDto) {
@@ -68,5 +67,12 @@ public class AuthService {
     public void logout(HttpServletRequest request, HttpServletResponse response) {
         String accessToken = CookieUtils.getCookieValueWithNameAndKill(request, response, ACCESS_TOKEN.getName());
         redisUtils.deleteData(accessToken);
+    }
+
+    private void setJwtToken(AuthUserInfo authUserInfo, HttpServletResponse response) {
+        String accessToken = jwtUtil.createAccessToken(authUserInfo);
+        String refreshToken = jwtUtil.createRefreshToken(authUserInfo);
+        jwtUtil.addRedisTokenInfo(refreshToken, accessToken);
+        jwtUtil.addAccessTokenToCookie(response, accessToken);
     }
 }

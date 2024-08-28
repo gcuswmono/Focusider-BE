@@ -64,7 +64,7 @@ public class CookieUtils {
         cookie.setMaxAge(maxAge);
         cookie.setDomain("focusider.shop");
         //cookie.setAttribute("SameSite", "None");
-        cookie.setSecure(false);
+        cookie.setSecure(true);
         response.addCookie(cookie);
     }
 }

@@ -28,6 +28,7 @@ public class ReadingStatQueryRepositoryImpl implements ReadingStatQueryRepositor
                                 ReadingStatResDto.class,
                                 weekInfo.title,
                                 comment.content,
+                                weekInfo.createdAt,
                                 list(Projections.constructor(ReadingStatDetailInfo.class,
                                         reading.createdAt,
                                         reading.readingTime,

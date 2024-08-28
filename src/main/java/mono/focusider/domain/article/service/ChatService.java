@@ -119,15 +119,15 @@ public class ChatService {
         List<Message> messages = new ArrayList<>();
         for (ConversationEntry entry : conversationHistory) {
             if (entry.getQuestion() != null) {
-                messages.add(new UserMessage("선생님: " + entry.getQuestion())); // UserMessage로 학생의 질문 추가
+                messages.add(new UserMessage("Q: " + entry.getQuestion())); // UserMessage로 학생의 질문 추가
             }
             if (entry.getAnswer() != null) {
-                messages.add(new AssistantMessage("학생: " + entry.getAnswer())); // AssistantMessage로 선생님의 답변 추가
+                messages.add(new AssistantMessage("A: " + entry.getAnswer())); // AssistantMessage로 선생님의 답변 추가
             }
         }
 
         // GPT에게 전달할 추가 메시지 생성
-        String promptText = "If you are the teacher, your answer will be used as a teacher's question. Next is a record of conversations with students. Continue with educational questions based on this conversation record. In Korean.";
+        String promptText = "You are the teacher. Your response should be a teacher's question. With the chat history, create another question, and if the student asks you or say i don't know, then explain about it. Answer in Korean.";
         messages.add(new UserMessage(promptText)); // UserMessage로 프롬프트 메시지 추가
 
         // Prompt 생성 시 List<Message> 사용
@@ -140,8 +140,9 @@ public class ChatService {
 
     // 4. GPT에게 요약 요청
     public String summarizeConversation(List<ConversationEntry> conversationEntries, String content) {
-        String prompt = "다음 글이 내용과 대화를 요약해 주세요. \n 다음은 글이고 " + content
-                + "다음은 이 글을 바탕으로 선생님과 학생의 채팅을 통한 학습 내역입니다."
+        String prompt = "summarize the article contents and chat history. \n Following content is article content "
+                + content
+                + "and following chat history is the conversation history: \n"
                 + conversationEntries.toString();
         Prompt gptPrompt = new Prompt(new UserMessage(prompt));
         ChatResponse response = chatModel.call(gptPrompt);
@@ -157,7 +158,8 @@ public class ChatService {
                     .append("\n");
         }
         String prompt = "based on the lecture, tell me evaluated score of how much student understood from 0 to 100: \n"
-                + compressedConversation.toString();
+                + article.getContent() + "this is article content and" + compressedConversation.toString()
+                + "this is chat history";
 
         Prompt gptPrompt = new Prompt(new UserMessage(prompt));
         ChatResponse response = chatModel.call(gptPrompt);

@@ -6,6 +6,7 @@ import mono.focusider.domain.member.domain.Member;
 
 import java.util.Optional;
 
+import static mono.focusider.domain.category.domain.QMemberCategory.memberCategory;
 import static mono.focusider.domain.file.domain.QFile.file;
 import static mono.focusider.domain.member.domain.QMember.member;
 
@@ -26,7 +27,8 @@ public class MemberQueryRepositoryImpl implements MemberQueryRepository{
     public Optional<Member> findByIdWithCategories(Long memberId) {
         return Optional.ofNullable(queryFactory
                 .selectFrom(member)
-                .leftJoin(member.memberCategories).fetchJoin()
+                .leftJoin(member.memberCategories, memberCategory).fetchJoin()
+                .leftJoin(memberCategory.category).fetchJoin()
                 .where(member.id.eq(memberId))
                 .fetchOne()
         );

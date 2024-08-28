@@ -27,7 +27,8 @@ public class SecurityConfig {
     private final AuthMapper authMapper;
     private final RedisUtils redisUtils;
 
-    private static final String[] whiteList = { "/api/auth/login", "/api/auth/signup", "/api/member/add", "/api/file",
+    private static final String[] whiteList = { "/api/auth/login", "/api/auth/signup", "/api/auth/duplicated",
+            "/api/member/add", "/api/file",
             "/api/quiz/make", "/v3/**", "/swagger-ui/**", "/.well-known/acme-challenge/*" };
 
     @Bean

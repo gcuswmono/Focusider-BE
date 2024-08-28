@@ -28,9 +28,7 @@ public class AuthValidator {
     }
 
     public void validatePassword(String password, String memberPassword, PasswordEncoder passwordEncoder) {
-        try {
-            passwordEncoder.matches(password, memberPassword);
-        } catch (Exception e) {
+        if(!passwordEncoder.matches(password, memberPassword)) {
             throw new ForbiddenException(GlobalErrorCode.MISMATCH_PASSWORD);
         }
     }

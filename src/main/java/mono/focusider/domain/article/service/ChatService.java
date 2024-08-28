@@ -123,7 +123,7 @@ public class ChatService {
         }
 
         // GPT에게 전달할 추가 메시지 생성
-        String promptText = "학생의 이전 응답을 바탕으로 이해도를 평가할 수 있는 신중한 질문을 생성해 주세요. 단 한문장의 질문만 생성해주세요.";
+        String promptText = "위와 같은 선생과 학생의 문답을 바탕으로 이해도를 평가할 수 있는 선생님의 질문을 생성해 주세요. 단 한문장의 질문만 생성해주세요.";
         messages.add(new UserMessage(promptText)); // UserMessage로 프롬프트 메시지 추가
 
         // Prompt 생성 시 List<Message> 사용

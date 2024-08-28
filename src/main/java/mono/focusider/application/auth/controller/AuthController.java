@@ -31,8 +31,9 @@ public class AuthController {
                         @ApiResponse(responseCode = "400", description = "Bad request - Invalid input")
         })
         @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-        public ResponseEntity<SuccessResponse<?>> signup(@Valid @RequestBody SignupReqDto requestDto) {
-                authService.signup(requestDto);
+        public ResponseEntity<SuccessResponse<?>> signup(@Valid @RequestBody SignupReqDto requestDto,
+                                                         HttpServletResponse response) {
+                authService.signup(requestDto, response);
                 return SuccessResponse.ok(null);
         }
 

@@ -80,3 +80,37 @@ For detailed API documentation, run the application and visit `http://localhost:
 - JWTs are used for stateless authentication
 - Refresh tokens are stored in Redis for added security
 - CORS is configured to allow requests from trusted origins
+
+### 패키지 구조
+
+```bash
+- application
+    └── domain
+        └── controller
+- domain
+    └── domain
+        ├── dto
+        │   ├── res
+        │   ├── req
+        │   └── info
+        ├── domain
+        ├── batch
+        ├── error
+        ├── helper
+        ├── mapper
+        ├── repository
+        ├── type
+        │   └── converter
+        └── service
+- global
+    ├── annotation
+    ├── aspect
+    ├── chat
+    ├── config
+    │   └── swagger
+    ├── domain
+    ├── error
+    ├── security
+    └── utils
+
+```

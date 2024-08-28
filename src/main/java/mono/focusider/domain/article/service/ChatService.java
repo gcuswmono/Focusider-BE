@@ -127,7 +127,7 @@ public class ChatService {
         }
 
         // GPT에게 전달할 추가 메시지 생성
-        String promptText = "If you are the teacher, your answer will be used as a teacher's question. Next is a record of conversations with students. Continue with educational questions based on this conversation record.";
+        String promptText = "If you are the teacher, your answer will be used as a teacher's question. Next is a record of conversations with students. Continue with educational questions based on this conversation record. In Korean.";
         messages.add(new UserMessage(promptText)); // UserMessage로 프롬프트 메시지 추가
 
         // Prompt 생성 시 List<Message> 사용

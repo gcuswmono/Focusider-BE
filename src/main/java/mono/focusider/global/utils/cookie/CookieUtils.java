@@ -48,7 +48,11 @@ public class CookieUtils {
 
     public static void killCookie(Cookie cookie, HttpServletResponse response) {
         cookie.setPath("/");
+        cookie.setHttpOnly(true);
         cookie.setMaxAge(0);
+        cookie.setDomain("focusider.shop");
+        //cookie.setAttribute("SameSite", "None");
+        cookie.setSecure(true);
         response.addCookie(cookie);
     }
 

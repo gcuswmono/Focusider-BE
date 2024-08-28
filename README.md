@@ -26,6 +26,10 @@
  <img width="400" alt="login" src="image/login.png"> 
 <br />
 
+### 메인 페이지
+
+ <img width="400" alt="login" src="image/main.png"> 
+<br />
 
 ## 🎮 프로젝트 설치 및 실행 방법
 

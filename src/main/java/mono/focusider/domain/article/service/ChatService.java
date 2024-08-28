@@ -127,7 +127,7 @@ public class ChatService {
         }
 
         // GPT에게 전달할 추가 메시지 생성
-        String promptText = "학생의 응답을 기반으로 다음 질문을 만들어주세요.";
+        String promptText = "당신은 친절한 선생님입니다. 학생의 응답을 기반으로 다음 질문을 기호나 설명없이 만들어주세요. 만약 잘 모르겠다고 하면 그에 대한 설명을 하고 다음 질문을 생성해주세요.";
         messages.add(new UserMessage(promptText)); // UserMessage로 프롬프트 메시지 추가
 
         // Prompt 생성 시 List<Message> 사용
@@ -140,7 +140,8 @@ public class ChatService {
 
     // 4. GPT에게 요약 요청
     public String summarizeConversation(List<ConversationEntry> conversationEntries, String content) {
-        String prompt = "다음 글이 내용과 대화를 요약해 주세요. \n 다음은 글이고 " + content + "다음은 이 글을 바탕으로 선생님과 학생의 채팅을 통한 학습 내역입니다."
+        String prompt = "다음 글이 내용과 대화를 요약해 주세요. \n 다음은 글이고 " + content
+                + "다음은 이 글을 바탕으로 선생님과 학생의 채팅을 통한 학습 내역입니다."
                 + conversationEntries.toString();
         Prompt gptPrompt = new Prompt(new UserMessage(prompt));
         ChatResponse response = chatModel.call(gptPrompt);
@@ -155,7 +156,8 @@ public class ChatService {
             compressedConversation.append("Q: ").append(entry.getQuestion()).append(" A: ").append(entry.getAnswer())
                     .append("\n");
         }
-        String prompt = "based on the lecture, tell me evaluated score of how much student understood from 0 to 100: \n" + compressedConversation.toString();
+        String prompt = "based on the lecture, tell me evaluated score of how much student understood from 0 to 100: \n"
+                + compressedConversation.toString();
 
         Prompt gptPrompt = new Prompt(new UserMessage(prompt));
         ChatResponse response = chatModel.call(gptPrompt);
@@ -251,7 +253,8 @@ public class ChatService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
         WeekInfo weekInfo = getWeekInfoWithNow();
-        Reading reading = Reading.createReading(member, article, readTime, summary, understandingScore.intValue(), weekInfo);
+        Reading reading = Reading.createReading(member, article, readTime, summary, understandingScore.intValue(),
+                weekInfo);
 
         // Reading 엔티티를 데이터베이스에 저장
         return readingRepository.save(reading); // 저장된 Reading 엔티티 반환

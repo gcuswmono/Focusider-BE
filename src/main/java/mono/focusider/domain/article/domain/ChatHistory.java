@@ -23,14 +23,15 @@ public class ChatHistory extends BaseTimeEntity {
     @JoinColumn(name = "article_id", nullable = false)
     private Article article;
 
-    @Column(name = "question")
+    @Column(name = "question", columnDefinition = "TEXT", nullable = false)
     private String question;
 
-    @Column(name = "answer")
+    @Column(name = "answer", columnDefinition = "TEXT", nullable = false)
     private String answer;
 
     // 질문과 답변을 저장할 때 사용
-    public static ChatHistory createWithQuestionAnsAnswer(Reading reading, Article article, String question, String answer) {
+    public static ChatHistory createWithQuestionAnsAnswer(Reading reading, Article article, String question,
+            String answer) {
         return ChatHistory.builder()
                 .reading(reading)
                 .article(article)

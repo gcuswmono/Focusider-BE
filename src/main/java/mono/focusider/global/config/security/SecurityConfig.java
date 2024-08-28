@@ -51,8 +51,7 @@ public class SecurityConfig {
                         authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
                                 .anyRequest().authenticated())
                 .addFilterBefore(new JwtFilter(jwtUtil, authMapper, redisUtils),
-                        UsernamePasswordAuthenticationFilter.class)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource));
+                        UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

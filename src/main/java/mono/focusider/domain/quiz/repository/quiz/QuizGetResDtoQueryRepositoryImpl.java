@@ -23,7 +23,7 @@ public class QuizGetResDtoQueryRepositoryImpl implements QuizGetResDtoQueryRepos
                 .from(quiz)
                 .leftJoin(quiz.choices, choice)
                 .leftJoin(quiz.quizAttempts, quizAttempt)
-                .where(quiz.level.eq(level).and(quizAttempt.isNull().or(quizAttempt.member.id.ne(memberId))))
+                .where(quiz.level.between(level - 1, level + 1).and(quizAttempt.isNull().or(quizAttempt.member.id.ne(memberId))))
                 .orderBy(Expressions.numberTemplate(Double.class, "RAND()").asc())
                 .transform(groupBy(quiz.id).as(
                         Projections.constructor(QuizGetResDto.class,

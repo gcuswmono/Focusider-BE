@@ -119,15 +119,15 @@ public class ChatService {
         List<Message> messages = new ArrayList<>();
         for (ConversationEntry entry : conversationHistory) {
             if (entry.getQuestion() != null) {
-                messages.add(new UserMessage(entry.getQuestion())); // UserMessage를 추가
+                messages.add(new UserMessage("선생님: " + entry.getQuestion())); // UserMessage로 학생의 질문 추가
             }
             if (entry.getAnswer() != null) {
-                messages.add(new AssistantMessage(entry.getAnswer())); // AssistantMessage를 추가
+                messages.add(new AssistantMessage("학생: " + entry.getAnswer())); // AssistantMessage로 선생님의 답변 추가
             }
         }
 
         // GPT에게 전달할 추가 메시지 생성
-        String promptText = "당신은 친절한 선생님입니다. 학생의 응답을 기반으로 다음 질문을 기호나 설명없이 만들어주세요. 만약 잘 모르겠다고 하면 그에 대한 설명을 하고 다음 질문을 생성해주세요.";
+        String promptText = "너가 선생님이고 너의 답변은 그대로 선생님 질문으로 쓰일거야. 다음은 학생과의 대화 기록이야. 이 대화 기록을 바탕으로 교육적인 질문을 이어가.";
         messages.add(new UserMessage(promptText)); // UserMessage로 프롬프트 메시지 추가
 
         // Prompt 생성 시 List<Message> 사용

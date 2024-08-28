@@ -17,6 +17,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -26,6 +27,7 @@ public class SecurityConfig {
     private final JwtUtil jwtUtil;
     private final AuthMapper authMapper;
     private final RedisUtils redisUtils;
+    private final CorsConfigurationSource corsConfigurationSource;
 
     private static final String[] whiteList = { "/api/auth/login", "/api/auth/signup", "/api/auth/duplicated",
             "/api/member/add", "/api/file",
@@ -49,7 +51,8 @@ public class SecurityConfig {
                         authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
                                 .anyRequest().authenticated())
                 .addFilterBefore(new JwtFilter(jwtUtil, authMapper, redisUtils),
-                        UsernamePasswordAuthenticationFilter.class);
+                        UsernamePasswordAuthenticationFilter.class)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource));
         return http.build();
     }
 

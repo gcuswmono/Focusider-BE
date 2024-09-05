@@ -23,8 +23,8 @@ jobs:
 
       - name: Create .env file for Backend
         run: |
-          rm -rf /home/ubuntu/focusider/.env
-          echo "${{ secrets.ENV_FILE }}" > /home/ubuntu/focusider/.env
+          rm -rf ./.env
+          echo "${{ secrets.ENV_FILE }}" > ./.env
 
       - name: Build and Push Docker Image
         env:
